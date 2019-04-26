@@ -10,7 +10,7 @@
 
 Open the url provided by your instructor and log in with your username and password.  Your username/password combination will be something like user15/r3dh4t1!
 
-![](./images/lab2/lab2-01-console-create_project.png)  
+![](./images/lab2/lab2-01-console.png)  
 
 ### Create a new project
 
@@ -21,15 +21,15 @@ We suggest:
 * Display Name: Red Hat Summit Insults
 * Description: Awesome Red Hat Summit Insult Workshop
 
-![](./images/lab2/lab2-02-console-create_project.png)  
+![](./images/lab2/lab2-02-console_create_project.png)  
 
-![](./images/lab2/lab2-03-console-create_project_success.png)  
+![](./images/lab2/lab2-03-console_create_project_success.png)  
 
 ### Log in from your laptop
 
 You can log in from a command prompt or from the terminal inside of Visual Studio Code. The first step is to get the login command from the OpenShift console.  Click on your name in the top right of the screen and choose, "Copy Login Command."  This puts the login command in your clipboard.
 
-![](./images/lab2/lab2-04-console-copy_login_command.png)  
+![](./images/lab2/lab2-04-console_copy_login_command.png)  
 
 If you are working from a command prompt simply paste the command into the prompt and enter it:
 
