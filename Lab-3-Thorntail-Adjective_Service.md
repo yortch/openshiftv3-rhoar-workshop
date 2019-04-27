@@ -155,7 +155,7 @@ You should see your pod running in OpenShift, and clicking on the url should dis
 
 ![](./images/lab3/lab-03-thorntail-03-ocp_initial_deployment.png)  
 
-![](./images/lab3/lab-03-thorntail-01-ocp_greeting.png)  
+![](./images/lab3/lab-03-thorntail-04-ocp_greeting.png)  
 
 ##  Create Adjective Rest Service
 
