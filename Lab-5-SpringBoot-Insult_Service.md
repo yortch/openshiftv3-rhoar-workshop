@@ -507,7 +507,7 @@ public class NounService {
 
 ```
 
-There are several things to note here.  First each service instantiates a Spring RestTemplate to handle the call to our existing microservices:
+The serices wrap a Spring RestTemplate that does the actual work of calling our existing microservices:
 
 ```java
 
@@ -518,5 +518,168 @@ There are several things to note here.  First each service instantiates a Spring
 ```
 
 Spring's RestTemplate simplifies marshalling Json into POJO's as well as provides functionality for authentication, form submission and other functionality.  You can read more about the class here: https://docs.spring.io/spring-boot/docs/2.1.3.RELEASE/reference/html/boot-features-resttemplate.html
+
+####  Update our JUnit Test
+
+The dependent services create a problem for JUnit test which is calling the Insult Service.  We need to mock out the Adjective and Noun Services so that we can isolate the Insult Service' functionality.  We also don't want to make actual http calls which could have unintended consequnces (not in this case though.)
+
+We will use Mockito, https://site.mockito.org/, to mock out our Services.  Mockito allows us to "train" our mock objects to return a specific response.  The following code tells our mock NounService to return the noun, "pantaloon," whenever it is called:
+
+```java
+
+  Mockito.when(nounService.getNoun()).thenReturn(new Noun("pantaloon"));
+
+```
+
+Mockito also allows us to return different results from subsequent calls to a Service.  The following code returns, "cockle-brained," for the first adjective and "puking" for the second:
+
+```java
+
+  Mockito.when(adjectiveService.getAdjective()).thenAnswer(new Answer<Adjective>() {
+      private int count = 0;
+      public Adjective answer(InvocationOnMock invocation) {
+          if (count++ == 1)
+              return new Adjective(("cockle-brained"));
+          return new Adjective("puking");
+      }
+  });
+
+```
+
+Spring makes it easy to use our Mockito mocks by providing a MockBean annotation that will inject our mocks instead of the actual beans:
+
+```java
+
+import org.springframework.boot.test.mock.mockito.MockBean;
+...
+
+    @MockBean
+    AdjectiveService adjectiveService;
+
+    @MockBean
+    NounService nounService;
+
+```
+
+
+Let's add this functionality by replacing or update the existing InsultServiceTest so that it matches the following code:
+
+```java
+
+package io.openshift.booster;
+
+import io.openshift.booster.model.Adjective;
+import io.openshift.booster.model.Noun;
+import io.openshift.booster.service.AdjectiveService;
+import io.openshift.booster.service.NounService;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
+
+import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class InsultServiceTest {
+
+    private static final String ENDPOINT_PATH = "api/insult";
+
+    @Value("${local.server.port}")
+    private int port;
+
+    @MockBean
+    AdjectiveService adjectiveService;
+
+    @MockBean
+    NounService nounService;
+
+    @Before
+    public void setUp(){
+
+        Mockito.when(nounService.getNoun()).thenReturn(new Noun("pantaloon"));
+        Mockito.when(adjectiveService.getAdjective()).thenAnswer(new Answer<Adjective>() {
+            private int count = 0;
+            public Adjective answer(InvocationOnMock invocation) {
+                if (count++ == 1)
+                    return new Adjective(("cockle-brained"));
+                return new Adjective("puking");
+            }
+        });
+        RestAssured.baseURI = String.format("http://localhost:%d/api/insult", port);
+    }
+
+    @Test
+    public void testInsultService() {
+        Response response = given()
+           .baseUri(baseURI())
+           .get(ENDPOINT_PATH)
+           .then()
+           .statusCode(200)
+           .extract().response();
+        assertNotNull(response);
+
+        assertEquals("{\"insult\":\"Verily, ye be a puking, cockle-brained pantaloon\"}", response.body().asString());
+    }
+
+    protected String baseURI() {
+        return String.format("http://localhost:%d", port);
+    }
+
+}
+
+``` 
+
+Run the test from your terminal with:
+
+```bash
+
+mvn clean test -Dtest=InsultServiceTest.class
+
+```
+
+![](./images/lab5/lab5-01-vscode-insultservicetest_success.png)  
+
+Our test should now pass.
+
+#### Build and deploy to OpenShift
+
+Now we can deploy our app.  From the terminal run the following maven command:
+
+```bash
+
+mvn clean fabric8:deploy -Popenshift  
+
+```
+
+This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
+
+```bash
+
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:40 min
+[INFO] Finished at: 2019-04-24T12:49:12-04:00
+[INFO] ------------------------------------------------------------------------
+
+```
+
+![](./images/4-1/vscode-04-fabric8_deploy.png)  
+
+![](./images/4-1/vscode-05-fabric8_deploy_success.png)  
 
 
