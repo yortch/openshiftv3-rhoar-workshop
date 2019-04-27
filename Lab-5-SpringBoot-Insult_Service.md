@@ -178,7 +178,7 @@ public class InsultServiceTest{
            .extract().response();
         assertNotNull(response);
 
-        String insult = response.toString();
+        assertEquals("{\"insult\":\"Verily, ye be a puking, cockle-brained pantaloon\"}", response.body().asString());
     }
 
     protected String baseURI() {
@@ -187,3 +187,336 @@ public class InsultServiceTest{
 }
 
 ````
+
+Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
+
+```bash
+
+mvn clean test -Dtest=InsultServiceTest
+
+```
+
+Obviously our test should fail.  If for some reason it passes feel free to raise your hand and ask for help.
+
+*This test will become significantly more complicated as we build out our service*
+
+### Pass our JUnit test
+
+#### Steps
+
+1.  Create a domain model with an Adjective, Noun, and Insult
+2.  Create Spring RestTemplates to call the Adjective and Noun Services
+3.  Create an InsultService that retrieves 2 adjectives and a noun and returns a complete Insult
+
+####  Create our Domain Models  
+
+We are only returning a String and don't really need a domain model, but to be consistent with the rest of the tutorial and of course real applications we will create a domain models for our application.  
+
+Create classes for our three models, "Adjective," "Noun," and "Insult."
+
+You may be wondering why we are re-creating the Adjective and Noun classes instead of using the ones we created earlier.  The answer is that we don't want any dependencies across Services.
+
+"Insult" in the package, "io.openshift.booster.insults.model"
+
+Our Insult model will contain 2 Adjectives and 1 Noun and will return an insult in the format of "Verily, ye be a cockle-brained, puking measle!"  
+
+```java
+
+package io.openshift.booster.model;
+
+public class Insult {
+
+    Adjective adjective1;
+
+    Adjective adjective2;
+
+    Noun noun;
+
+    public Insult(Adjective adjective1, Adjective adjective2, Noun noun) {
+        this.adjective1 = adjective1;
+        this.adjective2 = adjective2;
+        this.noun = noun;
+    }
+
+    public String getInsult() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Verily, ye be a ");
+        builder.append(adjective1.getAdjective());
+        builder.append(", ");
+        builder.append(adjective2.getAdjective());
+        builder.append(" ");
+        builder.append(noun.getNoun());
+        builder.append("!");
+        return builder.toString();
+    }
+
+    public Insult() {
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("\"insult\":\"");
+        builder.append(getInsult());
+        builder.append("\"");
+        builder.append("}");
+        return builder.toString();
+
+    }
+
+    public Adjective getAdjective1() {
+        return adjective1;
+    }
+
+    public void setAdjective1(Adjective adjective1) {
+        this.adjective1 = adjective1;
+    }
+
+    public Adjective getAdjective2() {
+        return adjective2;
+    }
+
+    public void setAdjective2(Adjective adjective2) {
+        this.adjective2 = adjective2;
+    }
+
+    public Noun getNoun() {
+        return noun;
+    }
+
+    public void setNoun(Noun noun) {
+        this.noun = noun;
+    }
+
+}
+
+
+```
+
+We also need Adjective and Noun domain models for our Insult to compile.  Create the Adjective and Noun models in the same package with the following code for Adjective:
+
+```java
+
+package io.openshift.booster.model;
+
+import java.util.Objects;
+
+public class Adjective {
+
+    private String adjective;
+
+
+    public Adjective() {
+    }
+
+    public Adjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    public String getAdjective() {
+        return adjective;
+    }
+
+    public void setAdjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Adjective adjective1 = (Adjective) o;
+        return Objects.equals(getAdjective(), adjective1.getAdjective());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getAdjective());
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Adjective{");
+        sb.append("adjective='").append(adjective).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+
+```
+
+and Noun:
+
+```java
+
+package io.openshift.booster.model;
+
+import java.util.Objects;
+
+public class Noun {
+
+    private String noun;
+
+    public Noun() {
+    }
+
+    public Noun(String noun) {
+        this.noun = noun;
+    }
+
+    public String getNoun() {
+        return noun;
+    }
+
+    public Noun noun(String noun) {
+        this.noun = noun;
+        return this;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if ((o == null) || (getClass() != o.getClass()))
+            return false;
+        Noun noun1 = (Noun) o;
+        return Objects.equals(noun, noun);
+    }
+
+    public int hashCode() {
+        return Objects.hash(new Object[]{noun});
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Noun{");
+        sb.append("noun='").append(noun).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+
+```
+
+#### Create the Insult Service
+
+Now that we have modeled our domain we can build our service.  Create a class, "InsultService," in the "io.openshift.booster.service" package with the following code:
+
+```java
+
+package io.openshift.booster.service;
+
+import io.openshift.booster.model.Adjective;
+import io.openshift.booster.model.Insult;
+import io.openshift.booster.model.Noun;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+@Path("/insult")
+@Component
+public class InsultService {
+
+    @Autowired
+    AdjectiveService adjectiveService;
+
+    @Autowired
+    NounService nounService;
+
+    @GET
+    @Produces("application/json")
+    public String insult() {
+
+        Adjective adjective1 = adjectiveService.getAdjective();
+        Adjective adjective2 = adjectiveService.getAdjective();
+        Noun noun = nounService.getNoun();
+
+        return new Insult(adjective1, adjective2, noun).toString();
+    }
+}
+
+
+```
+
+The class won't compile at the moment because of the 2 classes we are injecting.  We are injecting 2 services, "AdjectiveService" and "NounService"
+
+```java
+
+    @Autowired
+    AdjectiveService adjectiveService;
+
+    @Autowired
+    NounService nounService;
+
+
+```
+
+These services will be simple but like our domain model we are creating them to reflect how a real world application would be structured.
+
+The services are essentially the same with each one handling a single REST call to the appropriate microservice.  Let's create the 2 services:
+
+```java
+
+package io.openshift.booster.service;
+
+import io.openshift.booster.model.Adjective;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class AdjectiveService {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String adjectiveHost = System.getProperty("adjective.host", "http://smart-appliance:8080");
+
+    public Adjective getAdjective() {
+        return restTemplate.getForObject(adjectiveHost + "/api/adjectives", Adjective.class);
+    }
+}
+
+
+```
+
+and
+
+```java
+
+package io.openshift.booster.service;
+
+import io.openshift.booster.model.Noun;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class NounService {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String nounHost = System.getProperty("noun.host", "http://wooly-cucumber:8080");
+
+    public Noun getNoun() {
+        return restTemplate.getForObject(nounHost + "/api/noun", Noun.class);
+    }
+}
+
+```
+
+There are several things to note here.  First each service instantiates a Spring RestTemplate to handle the call to our existing microservices:
+
+```java
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    ...
+    restTemplate.getForObject(nounHost + "/api/noun", Noun.class);
+
+```
+
+Spring's RestTemplate simplifies marshalling Json into POJO's as well as provides functionality for authentication, form submission and other functionality.  You can read more about the class here: https://docs.spring.io/spring-boot/docs/2.1.3.RELEASE/reference/html/boot-features-resttemplate.html
+
+
