@@ -38,7 +38,7 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
-![](./images/lab3/lab-03-thorntail-vscode-01_import.png)  
+![](./images/lab3/lab-03-thorntail-01-vscode_import.png)  
 
 ### Build the app
 
@@ -53,7 +53,7 @@ mvn clean package
 
 The tests should all complete successfully, and you should see a success message.
 
-![](./images/lab3/lab-03-thorntail-vscode-01_build_success.png)  
+![](./images/lab3/lab-03-thorntail-02-vscode_build_success.png)  
 
 ### Deploying to OpenShift  
 
@@ -80,6 +80,15 @@ oc login https://api.pro-us-east-1.openshift.com --token=EbJWOzrH7bWkp_ARZzOALhe
 or into the terminal in Visual Studio Code:
 
 ![](./images/lab2/lab2-05-vscode_login.png)  
+
+*IMPORTANT: Be sure to set the appropriate project after logging in*
+
+```bash
+
+ oc project red-hat-summit-insults
+
+```
+
 
 ### Building a Docker container for OpenShift
 
@@ -122,4 +131,31 @@ We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  Th
 
 You can read more about the Fabric8 project here, http://fabric8.io/
 
+From the terminal run the following maven command:
+
+```bash
+mvn clean fabric8:deploy -Popenshift  
+```
+
+This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
+
+```bash
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:40 min
+[INFO] Finished at: 2019-04-24T12:49:12-04:00
+[INFO] ------------------------------------------------------------------------
+```
+
+### Verify OpenShift deployment
+
+You should see your pod running in OpenShift, and clicking on the url should display the default "Greeting" application.
+
+![](./images/lab3/lab-03-thorntail-03-ocp_initial_deployment.png)  
+
+![](./images/lab3/lab-03-thorntail-01-ocp_greeting.png)  
+
+##  Create Adjective Rest Service
 
