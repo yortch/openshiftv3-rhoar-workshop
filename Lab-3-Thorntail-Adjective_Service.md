@@ -13,7 +13,7 @@ In this lab we will create 3 rest services based on Thorntail
 
 Must have completed Labs 1 and 2. We will be using those components for following labs
 
-## Get the starter project up and runnint
+## Get the starter project up and running
 
 ###  Clone the repository 
 
@@ -158,4 +158,248 @@ You should see your pod running in OpenShift, and clicking on the url should dis
 ![](./images/lab3/lab-03-thorntail-04-ocp_greeting.png)  
 
 ##  Create Adjective Rest Service
+
+Now that we got an understanding of how to build our application and deploy it to OpenShift it's time to implement some actual functionality.  We need a REST endpoint that returns an adjective.
+
+We will be following Test Driven Development in this tutorial so our first step is to create a Unit Test.  We will use JUnit in this application.
+
+### Create and fail a JUnit Test for our endpoint
+
+```java
+
+package io.thorntail.example;
+
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit.Arquillian;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.wildfly.swarm.arquillian.DefaultDeployment;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+@RunWith(Arquillian.class)
+@DefaultDeployment
+public class AdjectiveEndpointTest {
+    @Test
+    @RunAsClient
+    public void serviceInvocation() {
+        Client client = ClientBuilder.newClient();
+        WebTarget target = client.target("http://localhost:8080")
+                .path("api").path("adjective");
+
+        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        Assert.assertEquals(200, response.getStatus());
+        Assert.assertNotNull(response.readEntity(String.class));
+    }
+
+}
+
+```
+
+Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
+
+```bash
+mvn clean test -Dtest=AdjectiveEndpointTest
+```
+
+The test should of course fail.
+
+### Pass our JUNit Test
+
+1. Create an Adjective domain model
+2. Create an AdjectiveResource to return an Adjective in JSON
+
+#### Adjective domain model
+
+We are only returning a String and don't really need a domain model, but to be consistent with real applications let's create an Adjective for our domain model.  Create a class, "Adjective" in the package, "io.openshift.booster.adjectives.model"
+
+
+```java
+
+package io.openshift.booster.adjectives.model;
+
+import java.util.Objects;
+
+public class Adjective {
+
+
+    private String adjective;
+
+    public Adjective() {
+    }
+
+    public Adjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    public String getAdjective() {
+        return adjective;
+    }
+
+    public Adjective adjective(String adjective) {
+        this.adjective = adjective;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Adjective adjective1 = (Adjective) o;
+        return Objects.equals(adjective, adjective1.adjective);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(adjective);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Adjective{");
+        sb.append("adjective='").append(adjective).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+```
+
+#### AdjectiveResource
+
+We will create an AdjectiveResource to return an adjective in JSON format.  We would typically inject an EntityManager and lookup an Adjective from a database.  
+
+```java
+
+    @PersistenceContext(unitName = "MyPU")
+    private EntityManager em;
+
+    ....
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Adjective getSingle(@PathParam("id") Integer id) {
+        return em.find(Adjective.class, id);
+    }
+
+
+```
+
+In this workshop we will load the adjectives from a file and store them in an ArrayList.  We will use the @PostConstruct method to load the Adjectives into a List as soon as the class is instantiated and then return a randomly selected Adjective from the list:
+
+```java
+
+    @PostConstruct
+    public void loadData() {
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("adjectives.txt");
+            if (is != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                reader.lines()
+                        .forEach(adj -> adjectives.add(new Adjective(adj.trim())));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+```
+
+
+```java
+
+package io.thorntail.example;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.PostConstruct;
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import io.thorntail.example.model.Adjective;
+
+@Path("/adjective")
+@ApplicationScoped
+public class AdjectiveResource {
+
+    private List<Adjective> adjectives = new ArrayList<>();
+
+    @GET
+    @Path("/")
+    @Produces("application/json")
+    public Adjective greeting() {
+        return adjectives.get(new Random().nextInt(adjectives.size()));
+    }
+
+    @PostConstruct
+    public void loadData() {
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("adjectives.txt");
+            if (is != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                reader.lines()
+                        .forEach(adj -> adjectives.add(new Adjective(adj.trim())));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}
+
+```
+
+Re-run the test case and verify that it passes.
+
+##### Verify locally
+
+Let's fire up Thorntail and check out the endpoint in a browser.  Inside of your project's "target" directly you will find a jar ending in "-thorntail.jar."  This is the jar we need to run:
+
+```bash
+
+java -jar ./target/adjective-service-1.0.0-thorntail.jar
+
+```
+
+![](./images/lab3/lab-03-thorntail-05-browser_verify_locally.png)  
+
+### Re-deploy to OpenShift
+
+From the terminal run the following maven command:
+
+```bash
+mvn clean fabric8:deploy -Popenshift  
+```
+
+This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
+
+```bash
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:40 min
+[INFO] Finished at: 2019-04-24T12:49:12-04:00
+[INFO] ------------------------------------------------------------------------
+```
+
+
+
+
 
