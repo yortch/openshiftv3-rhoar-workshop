@@ -1,4 +1,4 @@
-# Lab 1:  Creating Thorntail Rest Services
+# Lab 3:  Creating Thorntail Rest Services
 
 In this lab we will create 3 rest services based on Thorntail
 * Creating Thorntail Rest Services  

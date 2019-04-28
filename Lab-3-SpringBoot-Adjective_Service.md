@@ -153,7 +153,10 @@ You should see:
 
 ###  Create Adjective Rest Service
 
-Now that we got an understanding on how build and deploy works, lets create a new service for returning list of adjectives.  Of course, the first step should always be a test...
+Now that we got an understanding of how to build our application and deploy it to OpenShift it's time to implement some actual functionality.  We need a REST endpoint that returns an adjective.
+
+We will be following Test Driven Development in this tutorial so our first step is to create a Unit Test.  We will use JUnit in this application.
+
 
 #### Create and fail a JUnit Test for our endpoint
 
@@ -210,11 +213,12 @@ Run the test either by Clicking the "Run Test" link in the IDE (just under the @
 mvn clean test -Dtest=AdjectiveEndpointTest
 ```
 
+The test should of course fail.
 
-#### Pass our JUnit test
-Create Adjective Model Class  
 
-##### Steps
+### Pass our JUnit test
+
+#### Steps
 
 1. Create an Adjective domain model
 2. Create an AdjectiveRepository to retrieve    
