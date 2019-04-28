@@ -1,6 +1,6 @@
 # Lab 4:  Creating Thorntail Noun Services
 
-## Create Noun Spring Rest Service  
+## Create Noun Thorntail Rest Service  
 
 ###  Clone the repository 
 
@@ -35,7 +35,7 @@ Our first step will be to customize the starter application.  Open the pom.xml a
 
 ``` 
 
-![](./images/lab4/lab-04-thorntail-01-vscode_import_pom.xml.png)  
+![](./images/lab5/lab-05-thorntail-01-vscode_import_pom.xml.png)  
 
 ### Build the app
 
@@ -128,7 +128,6 @@ This build will take longer because we are building Docker containers in additio
 ![](./images/4-1/vscode-04-fabric8_deploy.png)  
 
 ![](./images/4-1/vscode-05-fabric8_deploy_success.png)  
-
 
 #### Validating the deployment:  
 
