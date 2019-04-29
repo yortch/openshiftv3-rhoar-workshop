@@ -165,8 +165,204 @@ Obviously our test should fail.  If for some reason it passes feel free to raise
 
 #### Steps
 
-1. Create an Insult domain model
-2. Create an InsultResource to retrieve and return JSON
+1.  Create a domain model with an Adjective, Noun, and Insult
+2.  Create Spring RestTemplates to call the Adjective and Noun Services
+3.  Create an InsultService that retrieves 2 adjectives and a noun and returns a complete Insult
+
+####  Create our Domain Models  
+
+We are only returning a String and don't really need a domain model, but to be consistent with the rest of the tutorial and of course real applications we will create a domain models for our application.  
+
+Create classes for our three models, "Adjective," "Noun," and "Insult."
+
+You may be wondering why we are re-creating the Adjective and Noun classes instead of using the ones we created earlier.  The answer is that we don't want any dependencies across Services.
+
+"Insult" in the package, "com.redhat.summit2019.model"
+
+Our Insult model will contain 2 Adjectives and 1 Noun and will return an insult in the format of "Verily, ye be a cockle-brained, puking measle!"  
+
+```java
+
+package com.redhat.summit2019.model;
+
+public class Insult {
+
+    Adjective adjective1;
+
+    Adjective adjective2;
+
+    Noun noun;
+
+    public Insult(Adjective adjective1, Adjective adjective2, Noun noun) {
+        this.adjective1 = adjective1;
+        this.adjective2 = adjective2;
+        this.noun = noun;
+    }
+
+    public String getInsult() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Verily, ye be a ");
+        builder.append(adjective1.getAdjective());
+        builder.append(", ");
+        builder.append(adjective2.getAdjective());
+        builder.append(" ");
+        builder.append(noun.getNoun());
+        builder.append("!");
+        return builder.toString();
+    }
+
+    public Insult() {
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("\"insult\":\"");
+        builder.append(getInsult());
+        builder.append("\"");
+        builder.append("}");
+        return builder.toString();
+
+    }
+
+    public Adjective getAdjective1() {
+        return adjective1;
+    }
+
+    public void setAdjective1(Adjective adjective1) {
+        this.adjective1 = adjective1;
+    }
+
+    public Adjective getAdjective2() {
+        return adjective2;
+    }
+
+    public void setAdjective2(Adjective adjective2) {
+        this.adjective2 = adjective2;
+    }
+
+    public Noun getNoun() {
+        return noun;
+    }
+
+    public void setNoun(Noun noun) {
+        this.noun = noun;
+    }
+
+}
+
+
+```
+
+We also need Adjective and Noun domain models for our Insult to compile.  Create the Adjective and Noun models in the same package with the following code for Adjective:
+
+```java
+
+package com.redhat.summit2019.model;
+
+import java.util.Objects;
+
+public class Adjective {
+
+    private String adjective;
+
+
+    public Adjective() {
+    }
+
+    public Adjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    public String getAdjective() {
+        return adjective;
+    }
+
+    public void setAdjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Adjective adjective1 = (Adjective) o;
+        return Objects.equals(getAdjective(), adjective1.getAdjective());
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(getAdjective());
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Adjective{");
+        sb.append("adjective='").append(adjective).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+
+```
+
+and Noun:
+
+```java
+
+package com.redhat.summit2019.model;
+
+import java.util.Objects;
+
+public class Noun {
+
+    private String noun;
+
+    public Noun() {
+    }
+
+    public Noun(String noun) {
+        this.noun = noun;
+    }
+
+    public String getNoun() {
+        return noun;
+    }
+
+    public Noun noun(String noun) {
+        this.noun = noun;
+        return this;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if ((o == null) || (getClass() != o.getClass()))
+            return false;
+        Noun noun1 = (Noun) o;
+        return Objects.equals(noun, noun);
+    }
+
+    public int hashCode() {
+        return Objects.hash(new Object[]{noun});
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Noun{");
+        sb.append("noun='").append(noun).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+```
+
+
 
 
 
