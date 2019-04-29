@@ -527,13 +527,71 @@ url.adjective=http://localhost:8081
 url.noun=http://localhost:8081
 
 # OpenShift
-# url.adjective="http://insult-adjectives:8080"
-# url.noun="http://insult-nouns:8080"
+# url.adjective=http://insult-adjectives:8080
+# url.noun=http://insult-nouns:8080
 
 ```
 
 Kubernetes will resolve applications based on their names so, "http://insult-adjectives:8080" will work once we deploy to OpenShift.  However, for testing we want to use our local server, "http://localhost:8081," as configured in our InsultResourceTest.
 
 IMPORTANT: Be sure to update these before deploying to OpenShift!
+
+Re-run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
+
+```bash
+
+mvn clean test -Dtest=InsultResourceTest
+
+```
+
+![](./images/lab5/lab-05-thorntail-04-ocp_greeting.png)  
+
+At this point our test should pass.  If for some reason it doesn't feel free to raise your hand and ask for help.
+
+### Deploy to OpenShift
+
+Open the microprofile-config.properties file and swap the properties so that the urls point to insult-adjectives and insult-nouns:
+
+```
+
+# Local
+# url.adjective=http://localhost:8081
+# url.noun=http://localhost:8081
+
+# OpenShift
+url.adjective=http://insult-adjectives:8080
+url.noun=http://insult-nouns:8080
+
+```
+
+Now we can deploy our app.  From the terminal run the following maven command (and be sure to skip the tests):
+
+```bash
+
+mvn clean fabric8:deploy -Popenshift -DskipTests
+
+```
+
+We have to skip the tests because we have changed the microprofile-config.properties to our OpenShift properties.
+
+This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
+
+```bash
+
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:40 min
+[INFO] Finished at: 2019-04-24T12:49:12-04:00
+[INFO] ------------------------------------------------------------------------
+
+```
+
+![](./images/lab5/lab-05-thorntail-03-ocp_deploy_success.png)  
+
+This time let's verify the application by pulling up the insult endpoint:
+
+![](./images/lab5/lab-05-thorntail-06-ocp_browser_verify.png)  
 
 
