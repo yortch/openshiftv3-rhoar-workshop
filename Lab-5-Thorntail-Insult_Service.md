@@ -118,9 +118,12 @@ We will take the same, test-driven approach to building the Insult Service that 
 
 package com.redhat.summit2019;
 
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.wildfly.swarm.arquillian.DefaultDeployment;
@@ -131,25 +134,119 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
+
 @RunWith(Arquillian.class)
 @DefaultDeployment
 public class InsultResourceTest {
 
+    @Rule
+    public WireMockRule wireMockRule = new WireMockRule(options().port(8081));
+
     @Test
     @RunAsClient
-    public void serviceInvocation() {
+    public void testInsultResource(){
+
+        stubFor(get(urlEqualTo("/api/adjective"))
+                .inScenario("insult-scenario")
+                .whenScenarioStateIs(Scenario.STARTED)
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"adjective\": \"puking\"}"))
+                .willSetStateTo("initial insult retrieved"));
+
+        stubFor(get(urlEqualTo("/api/adjective"))
+                .inScenario("insult-scenario")
+                .whenScenarioStateIs("initial insult retrieved")
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"adjective\": \"beslubbering\"}"))
+                .willSetStateTo("initial insult retrieved"));
+
+        stubFor(get(urlPathMatching("/api/noun"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"noun\": \"pantaloon\"}")));
+
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target("http://localhost:8080")
-                .path("api").path("noun");
+                .path("api").path("insult");
 
         Response response = target.request(MediaType.APPLICATION_JSON).get();
         Assert.assertEquals(200, response.getStatus());
-        Assert.assertNotNull(response.readEntity(String.class));
+        String returnedInsult = response.readEntity(String.class);
+        Assert.assertEquals(returnedInsult, "{\"insult\":\"Verily, ye be a puking, beslubbering pantaloon!\"}");
     }
 
 }
 
 ```
+
+There are a couple of things here that may not be familiar.  First, we are using WireMock to stub our our Adjective and Noun services:
+
+```java
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
+
+...
+
+    stubFor(get(urlEqualTo("/api/adjective"))
+            .inScenario("insult-scenario")
+            .whenScenarioStateIs(Scenario.STARTED)
+            .willReturn(aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBody("{\"adjective\": \"puking\"}"))
+            .willSetStateTo("initial insult retrieved"));
+
+    stubFor(get(urlEqualTo("/api/adjective"))
+            .inScenario("insult-scenario")
+            .whenScenarioStateIs("initial insult retrieved")
+            .willReturn(aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBody("{\"adjective\": \"beslubbering\"}"))
+            .willSetStateTo("initial insult retrieved"));
+
+    stubFor(get(urlPathMatching("/api/noun"))
+            .willReturn(aResponse()
+                    .withStatus(200)
+                    .withHeader("Content-Type", "application/json")
+                    .withBody("{\"noun\": \"pantaloon\"}")));
+
+```
+
+WireMock spins up mock web server and returns the subs we defined.  We are using WireMock Scenarios to return different adjectives:
+
+```java
+
+    .inScenario("insult-scenario")
+    .whenScenarioStateIs(Scenario.STARTED)
+
+```
+
+The second part that might not be familiar is the RestEasy client; however, if you have ever used a REST Client RESTEasy should feel familiar:
+
+```java
+
+    Client client = ClientBuilder.newClient();
+    WebTarget target = client.target("http://localhost:8080")
+            .path("api").path("insult");
+
+    Response response = target.request(MediaType.APPLICATION_JSON).get();
+    Assert.assertEquals(200, response.getStatus());
+    String returnedInsult = response.readEntity(String.class);
+
+
+```
+
+RESTEasy handles the call to our Insult Service and translates the result into a String that we can run Assertions agains.
 
 Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
 
@@ -249,7 +346,6 @@ public class Insult {
     public void setNoun(Noun noun) {
         this.noun = noun;
     }
-
 }
 
 
@@ -307,7 +403,6 @@ public class Adjective {
 
 }
 
-
 ```
 
 and Noun:
@@ -362,8 +457,83 @@ public class Noun {
 
 ```
 
+It's not a bad idea to run a quick build just to make sure everything was typed in correctly.  Be sure to skip the tests for now:
 
+```bash
 
+ mvn clean pacakge -DskipTests
 
+```
+
+The application should compile and build with no problems.
+
+#### Create the Insult Service
+
+Now that we have modeled our domain we can build our service.  Create a class, "InsultResource," in the "com.redhat.summit2019" package with the following code:
+
+```java
+
+package com.redhat.summit2019;
+
+import com.redhat.summit2019.model.Insult;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+@Path("/")
+@ApplicationScoped
+public class InsultResource{
+
+    @Inject @ConfigProperty(name="url.adjective")
+    private String adjectiveURL;
+
+    @Inject @ConfigProperty(name="url.noun")
+    private String nounURL;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/insult")
+    public String getInsult() throws Exception {
+
+        ResteasyClient nounClient = new ResteasyClientBuilder().build();
+        ResteasyWebTarget nounTarget = nounClient.target(nounURL);
+        NounService nounService = nounTarget.proxy(NounService.class);
+
+        ResteasyClient adjClient = new ResteasyClientBuilder().build();
+        ResteasyWebTarget adjTarget = adjClient.target(adjectiveURL);
+        AdjectiveService adjService = adjTarget.proxy(AdjectiveService.class);
+
+        return new Insult(adjService.getAdjective(),
+            adjService.getAdjective(),
+            nounService.getNoun()).toString();
+    }
+
+}
+
+```
+
+We are injecting 2 properties from a configuration file, "adjectiveURL," and "nounURL."  The configuration file is location in "src/main/resources/META-INF" and contains the following properties:
+
+```
+
+# Local
+url.adjective=http://localhost:8081
+url.noun=http://localhost:8081
+
+# OpenShift
+# url.adjective="http://insult-adjectives:8080"
+# url.noun="http://insult-nouns:8080"
+
+```
+
+Kubernetes will resolve applications based on their names so, "http://insult-adjectives:8080" will work once we deploy to OpenShift.  However, for testing we want to use our local server, "http://localhost:8081," as configured in our InsultResourceTest.
+
+IMPORTANT: Be sure to update these before deploying to OpenShift!
 
 
