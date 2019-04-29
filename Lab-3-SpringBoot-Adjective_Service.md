@@ -76,7 +76,7 @@ The tests should all complete successfully, and you should see a success message
 
 ##### Building a Docker container for OpenShift
 
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 115-140:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
 
 ```xml
           <plugin>
@@ -114,7 +114,9 @@ Paste and enter the command into your terminal
 Now we can deploy our app.  From the terminal run the following maven command:
 
 ```bash
+
 mvn clean fabric8:deploy -Popenshift  
+
 ```
 
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:

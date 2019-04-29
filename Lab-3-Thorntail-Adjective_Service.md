@@ -140,6 +140,7 @@ mvn clean fabric8:deploy -Popenshift
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
 ```bash
+
 [INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -147,6 +148,7 @@ This build will take longer because we are building Docker containers in additio
 [INFO] Total time:  06:40 min
 [INFO] Finished at: 2019-04-24T12:49:12-04:00
 [INFO] ------------------------------------------------------------------------
+
 ```
 
 ### Verify OpenShift deployment
