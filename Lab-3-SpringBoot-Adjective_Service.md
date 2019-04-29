@@ -1,4 +1,4 @@
-## Lab 1:  Creating SpringBoot Rest Services
+## Lab 3:  Creating a SpringBoot Adjective Services
 
 In this lab we will create 3 rest services based on SpringBoot
 * Creating SpringBoot Rest Services  
@@ -76,7 +76,7 @@ The tests should all complete successfully, and you should see a success message
 
 ##### Building a Docker container for OpenShift
 
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 115-140:
 
 ```xml
           <plugin>

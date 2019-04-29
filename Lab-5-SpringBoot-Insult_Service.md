@@ -402,6 +402,16 @@ public class Noun {
 
 ```
 
+It's not a bad idea to run a quick build just to make sure everything was typed in correctly.  Be sure to skip the tests for now:
+
+```bash
+
+ mvn clean pacakge -DskipTests
+
+```
+
+The application should compile and build with no problems.
+
 #### Create the Insult Service
 
 Now that we have modeled our domain we can build our service.  Create a class, "InsultService," in the "io.openshift.booster.service" package with the following code:
