@@ -19,7 +19,7 @@ Must have completed Labs 1 and 2. We will be using those components for followin
 
 ```bash
 
-git clone https://github.com/jeremyrdavis/trusty-art.git
+git clone https://github.com/jeremyrdavis/insult-starter-thorntail.git
 
 ```
 
@@ -167,9 +167,11 @@ We will be following Test Driven Development in this tutorial so our first step 
 
 ### Create and fail a JUnit Test for our endpoint
 
+Create a class, "AdjectiveResourceTest" in the test directory's "com.redhat.summit2019" package with the following code:
+
 ```java
 
-package io.thorntail.example;
+package com.redhat.summit2019;
 
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -186,7 +188,7 @@ import javax.ws.rs.core.Response;
 
 @RunWith(Arquillian.class)
 @DefaultDeployment
-public class AdjectiveEndpointTest {
+public class AdjectiveResourceTest {
     @Test
     @RunAsClient
     public void serviceInvocation() {
@@ -206,7 +208,9 @@ public class AdjectiveEndpointTest {
 Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
 
 ```bash
-mvn clean test -Dtest=AdjectiveEndpointTest
+
+mvn clean test -Dtest=AdjectiveResourceTest
+
 ```
 
 The test should of course fail.
@@ -223,7 +227,7 @@ We are only returning a String and don't really need a domain model, but to be c
 
 ```java
 
-package io.openshift.booster.adjectives.model;
+package com.redhat.summit2019.model;
 
 import java.util.Objects;
 
@@ -317,7 +321,7 @@ In this workshop we will load the adjectives from a file and store them in an Ar
 
 ```java
 
-package io.thorntail.example;
+package com.redhat.summit2019;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -334,7 +338,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import io.thorntail.example.model.Adjective;
+import com.redhat.summit2019.model.Adjective;
 
 @Path("/adjective")
 @ApplicationScoped

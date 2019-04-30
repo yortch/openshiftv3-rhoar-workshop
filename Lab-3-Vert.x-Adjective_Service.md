@@ -46,7 +46,7 @@ Open Visual Studio Code, choose "Open," and navigate to the root folder of the p
 
 ### Update the app
 
-Our first step will be to customize the starter application.  Open the pom.xml and change lines 5, 8 and 9 to be "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
+Our first step will be to customize the starter application.  Open the pom.xml and change lines 5, 8, and 9 to be "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
 
 ```xml
 
@@ -320,10 +320,245 @@ mvn clean test -Dtest=AdjectiveEndpointTest
 
 The test should of course fail.
 
+### Pass our JUnit test
+
+The Vertx Web module makes it easy to build webapps, but we are only implementing a single endpoint so we will stick with basic HTTP functionality.  Open the HttpApplication class and add the following method to handle returning an adjective (we will hard code an adjective for our initial pass):
+
+#### Create a method to handle GET requests
+
+```java
+
+  private void adjectiveHandler(RoutingContext rc) {
+
+    JsonObject response = new JsonObject()
+            .put("adjective", "clapper-clawed");
+
+    rc.response()
+            .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+            .end(response.encodePrettily());
+  }
+
+```
+
+##### RoutingContext 
+
+Our handler method takes a Vert.x RoutingContext as an argument.  
+
+The RoutingContext encapsulates the context for handling an Http request.  Vert.x creates a new RoutingContext for each HTTP request that is handled by Router#handle(HttpServerRequest) methods and automatically discards it after processing is finished.
+
+The RoutingContext provides access to the HttpServerRequest and HttpServerResponse and allows you to maintain arbitrary data that lives for the lifetime of the context.
+
+##### JsonObject
+
+Vert.x' JsonObject encapsulates the notion of a JSON Object and makes it extremely easy to work with JSON.
+
+#### Add the route
+
+We will add the following route on line 22 just after the existing route for "/api/greeting":
+
+```java
+
+    router.get("/api/adjective").handler(this::adjectiveHandler);
+
+```
+
+The entire class will now be:
+
+```java
+
+package com.redhat.summit2019;
+
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.StaticHandler;
+
+import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+
+public class HttpApplication extends AbstractVerticle {
+
+  static final String template = "Hello, %s!";
+
+  @Override
+  public void start(Future<Void> future) {
+    // Create a router object.
+    Router router = Router.router(vertx);
+
+    router.get("/api/greeting").handler(this::greeting);
+    router.get("/api/adjective").handler(this::adjectiveHandler);
+    router.get("/*").handler(StaticHandler.create());
+
+    // Create the HTTP server and pass the "accept" method to the request handler.
+    vertx
+        .createHttpServer()
+        .requestHandler(router)
+        .listen(
+            // Retrieve the port from the configuration, default to 8080.
+            config().getInteger("http.port", 8080), ar -> {
+              if (ar.succeeded()) {
+                System.out.println("Server started on port " + ar.result().actualPort());
+              }
+              future.handle(ar.mapEmpty());
+            });
+
+  }
+
+  private void adjectiveHandler(RoutingContext rc) {
+
+    JsonObject response = new JsonObject()
+            .put("adjective", "clapper-clawed");
+
+    rc.response()
+            .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+            .end(response.encodePrettily());
+  }
+
+  private void greeting(RoutingContext rc) {
+    String name = rc.request().getParam("name");
+    if (name == null) {
+      name = "World";
+    }
+
+    JsonObject response = new JsonObject()
+        .put("content", String.format(template, name));
+
+    rc.response()
+        .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+        .end(response.encodePrettily());
+  }
+}
+
+
+```
+
+Re-run the test case and verify that it passes.
+
+```bash
+
+mvn clean test -Dtest=AdjectiveEndpointTest
+
+```
+
+The test should pass, but we aren't actually doing anything.  Let's load the adjectives into memory and return a random one from our handler method.
+
+#### Loading the adjectives
+
+Let's create a method to load the content of the adjectives.txt file:
+
+```java
+
+  private Future<Void> loadAdjectives() {
+
+    if (adjectives == null) {
+      adjectives = new ArrayList<>();
+    }
+
+    Future<Void> future = Future.future();
+
+    try {
+      InputStream is = this.getClass().getClassLoader().getResourceAsStream("adjectives.txt");
+      if (is != null) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        reader.lines()
+                .forEach(adj -> adjectives.add(new Adjective(adj.trim())));
+      }
+      future.complete();
+    } catch (Exception e) {
+      e.printStackTrace();
+      future.fail(e.getCause());
+    }
+
+    return future;
+  }
+
+```
+
+##### Vertx Futures
+
+Most of this method is pretty standard stuff; however, the use of Vertx Futures is probably new:
+
+```java
+
+  private Future<Void> loadAdjectives() {
+
+    ...
+
+    Future<Void> future = Future.future();
+
+    ...
+
+      future.complete();
+    ...
+
+      future.fail(e.getCause());
+
+```
+
+Vertx Futures represent the result of an action that may, or may not, have occurred yet.  They allow us to call multiple methods and do other work while the methods execute.
+
+You probably noticed that we are blocking the event loop while reading the adjectives file.  "Don't block the event loop!" is Vert.x' cardinal rule, but in the case of initializing the app it is okay.  After all if we can't load the adjectives there is no reason for the service to start.
+
+Let's extract the code that creates the HttpServer into its' own method that returns a Future:
+
+```java
+
+  private Future<Void> startHttpServer(){
+    Future<Void> future = Future.future();
+
+    // Create a router object.
+    Router router = Router.router(vertx);
+
+    router.get("/api/greeting").handler(this::greeting);
+    router.get("/api/adjective").handler(this::adjectiveHandler);
+    router.get("/*").handler(StaticHandler.create());
+
+    // Create the HTTP server and pass the "accept" method to the request handler.
+    vertx
+      .createHttpServer()
+      .requestHandler(router)
+      .listen(
+              // Retrieve the port from the configuration, default to 8080.
+              config().getInteger("http.port", 8080), ar -> {
+                if (ar.succeeded()) {
+                  System.out.println("Server started on port " + ar.result().actualPort());
+                  future.complete();
+                }else{
+                  future.fail(ar.cause());
+                }
+              });
+
+    return future;
+  }
+
+```
+
+This code is almost identical to the previous method except for the addition of a Vert.x Future.
+
+Now we can put our Futures to use.  Change the start method to the following:
+
+```java
+
+  @Override
+  public void start(Future<Void> startFuture) {
+    Future init = loadAdjectives().compose(v -> startHttpServer()).setHandler(startFuture.completer());
+  }
+
+```
+
+In this method we are chaining together multiple Futures with the final result either succeeding and starting the class or failing and preventing it from starting.
+
+1.  We have a Future<Void> method in our start signature.  This will tell our class that it has successfully started or not
+2.  We have a Future "init" which combines or "composes" loading the adjectives and starting the HttpServer
+3.  As each Future completes it kicks off the next one with its' success or failure.  A single failure will prevent our application from starting
+
+
+
 
 //-------------------------------------------------------------------------------------------------
 
-Let's get started wiht asynchronous testing.  Create a TestCase, "AdjectiveEndpointTest" in the "com.redhat.summit2019" package.  The test case will make an asynchronous call to our Adjective endpoint and verify the result against a Collection of Adjectives in memory.
+Let's get started with asynchronous testing.  Create a TestCase, "AdjectiveEndpointTest" in the "com.redhat.summit2019" package.  The test case will make an asynchronous call to our Adjective endpoint and verify the result against a Collection of Adjectives in memory.
 
 Add the following content which we will dive into below:
 
