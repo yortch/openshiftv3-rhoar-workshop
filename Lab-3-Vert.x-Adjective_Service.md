@@ -554,186 +554,41 @@ In this method we are chaining together multiple Futures with the final result e
 3.  As each Future completes it kicks off the next one with its' success or failure.  A single failure will prevent our application from starting
 
 
+Re-run the test case and verify that it passes.
 
+```bash
 
-//-------------------------------------------------------------------------------------------------
-
-Let's get started with asynchronous testing.  Create a TestCase, "AdjectiveEndpointTest" in the "com.redhat.summit2019" package.  The test case will make an asynchronous call to our Adjective endpoint and verify the result against a Collection of Adjectives in memory.
-
-Add the following content which we will dive into below:
-
-```java
-
-package com.redhat.summit2019;
-
-import com.redhat.summit2019.model.Adjective;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.file.AsyncFile;
-import io.vertx.core.file.OpenOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.parsetools.RecordParser;
-import io.vertx.ext.unit.Async;
-import io.vertx.ext.unit.TestContext;
-import io.vertx.ext.unit.junit.VertxUnitRunner;
-import io.vertx.ext.web.client.WebClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static junit.framework.TestCase.assertTrue;
-
-@RunWith(VertxUnitRunner.class)
-public class AdjectiveEndpointTest {
-
-    private static final int PORT = 8081;
-
-    private Vertx vertx;
-    private WebClient client;
-
-    private List<Adjective> adjectives;
-
-    @Before
-    public void before(TestContext context) {
-        adjectives = new ArrayList<Adjective>();
-        vertx = Vertx.vertx();
-        vertx.exceptionHandler(context.exceptionHandler());
-        vertx.deployVerticle(HttpApplication.class.getName(),
-            new DeploymentOptions().setConfig(new JsonObject().put("http.port", PORT)),
-            context.asyncAssertSuccess());
-        client = WebClient.create(vertx);
-
-        // Load the adjectives
-        RecordParser recordParser = RecordParser.newDelimited("\n", bufferedLine -> {
-            adjectives.add(new Adjective(bufferedLine.toString()));
-        });
-
-        AsyncFile asyncFile = vertx.fileSystem().openBlocking("adjectives.txt", new OpenOptions());
-
-        asyncFile.handler(recordParser)
-                .endHandler(v -> {
-                    asyncFile.close();
-                });
-    }
-
-    @After
-    public void after(TestContext context) {
-        vertx.close(context.asyncAssertSuccess());
-    }
-
-    @Test
-    public void callAdjectiveEndpoint(TestContext context) {
-        // Send a request and get a response
-        Async async = context.async();
-        client.get(PORT, "localhost", "/api/adjective")
-            .send(resp -> {
-                context.assertTrue(resp.succeeded());
-                context.assertEquals(resp.result().statusCode(), 200);
-                Adjective adjective = resp.result().bodyAsJson(Adjective.class);
-                assertTrue(adjectives.contains(adjective));
-                async.complete();
-            });
-    }
-}
+mvn clean test -Dtest=AdjectiveEndpointTest
 
 ```
 
-There are 2 particularly interesting parts of this test case.  First the test method, "callAdjectiveEndpoint" :
+The test should pass, and this time we are actually doing something.
 
-```java
+### Build and deploy to OpenShift
 
-    @Test
-    public void callAdjectiveEndpoint(TestContext context) {
-        // Send a request and get a response
-        Async async = context.async();
-        client.get(PORT, "localhost", "/api/adjective")
-            .send(resp -> {
-                context.assertTrue(resp.succeeded());
-                context.assertEquals(resp.result().statusCode(), 200);
-                Adjective adjective = resp.result().bodyAsJson(Adjective.class);
-                assertTrue(adjectives.contains(adjective));
-                async.complete();
-            });
-    }
+Now we can deploy our app.  From the terminal run the following maven command:
+
+```bash
+
+mvn clean fabric8:deploy -Popenshift 
 
 ```
 
-There are 3 things to take note of in this method:
-1.  The method takes a single argument, "TestContext."  Vertx Unit provides a TestContext that is used for performing assertions and completing the test
-2.  The TestContext provides us with get an "Async" object, and complete the test by calling, "async.complete()"
-3.  We call "response.bodyAsJson()," pass in an object from our domain model, and get back that object without doing any marshalling from JSON
+This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
-Second, our "@Before" method:
-
-```java
-
-    @Before
-    public void before(TestContext context) {
-        adjectives = new ArrayList<Adjective>();
-        vertx = Vertx.vertx();
-        vertx.exceptionHandler(context.exceptionHandler());
-        vertx.deployVerticle(HttpApplication.class.getName(),
-            new DeploymentOptions().setConfig(new JsonObject().put("http.port", PORT)),
-            context.asyncAssertSuccess());
-        client = WebClient.create(vertx);
-
-        // Load the adjectives
-        RecordParser recordParser = RecordParser.newDelimited("\n", bufferedLine -> {
-            adjectives.add(new Adjective(bufferedLine.toString()));
-        });
-
-        AsyncFile asyncFile = vertx.fileSystem().openBlocking("adjectives.txt", new OpenOptions());
-
-        asyncFile.handler(recordParser)
-                .endHandler(v -> {
-                    asyncFile.close();
-                });
-    }
-
+```bash
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  06:40 min
+[INFO] Finished at: 2019-04-24T12:49:12-04:00
+[INFO] ------------------------------------------------------------------------
 ```
+#### Verify OpenShift deployment
 
-There are several things happening in the Before method that we will look at.
+You should see your pod running in OpenShift, and clicking on the url should display the default "Greeting" application.
 
-1.  We use our class' Vertx instance to configure our TestContext and deploy our Verticle:
+![](./images/lab3/lab-03-vertx-04-ocp_deploy_success.png)  
 
-```java
-
-        vertx = Vertx.vertx();
-        vertx.exceptionHandler(context.exceptionHandler());
-        vertx.deployVerticle(HttpApplication.class.getName(),
-            new DeploymentOptions().setConfig(new JsonObject().put("http.port", PORT)),
-            context.asyncAssertSuccess());
-
-```
-
-2.  We get a Vertx WebClient from our TestContext.  We will use the WebClient to excercise our endpoint in the test method.
-
-```java
-
-        client = WebClient.create(vertx);
-
-```
-
-3.  We load a list of adjectives into memory asynchronously:
-
-```java
-
-        // Load the adjectives
-        RecordParser recordParser = RecordParser.newDelimited("\n", bufferedLine -> {
-            adjectives.add(new Adjective(bufferedLine.toString()));
-        });
-
-        AsyncFile asyncFile = vertx.fileSystem().openBlocking("adjectives.txt", new OpenOptions());
-
-        asyncFile.handler(recordParser)
-                .endHandler(v -> {
-                    asyncFile.close();
-                });
-
-```
-
-
+![](./images/lab3/lab-03-vertx-05-ocp_greeting.png)  
