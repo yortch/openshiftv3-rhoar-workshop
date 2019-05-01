@@ -1,4 +1,4 @@
-# Lab 4:  Creating a Vert.x Noun Services
+# Lab 5 Vert.x Insult Service
 
 ## Pre-requisites 
 
@@ -42,17 +42,19 @@ Open Visual Studio Code, choose "Open," and navigate to the root folder of the p
 
 ### Update the app
 
+Rename the cloned or unzipped folder to "shakespearean-insults."
+
 Our first step will be to customize the starter application.  Open the pom.xml and change lines 5, 8, and 9 to be "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
 
 ```xml
 
 3  <modelVersion>4.0.0</modelVersion>
 4  <groupId>com.redhat.summit2019</groupId>
-5  <artifactId>insult-nouns</artifactId>
+5  <artifactId>shakespearean-insults</artifactId>
 6  <version>1.0.0</version>
 7  <packaging>jar</packaging>
-8  <name>Insult Nouns</name>
-9  <description>Red Hat Summit 2019 Insult Workshop Noun Service</description>
+8  <name>Shakespearean Insults</name>
+9  <description>Red Hat Summit 2019 Insult Workshop Insult Service</description>
 
 ``` 
 
@@ -98,9 +100,17 @@ We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  Th
 
 You can read more about the Fabric8 project here, http://fabric8.io/
 
-#### Log in to OpenShift
+#### Build and deploy to OpenShift
 
-Fabric8 will build a Docker container and deploy it to OpenShift for us, but we need to be logged in first.  From your OpenShift console copy the login command by clicking on your name in the top right and choosing, "Copy Login Command."
+Fabric8 will build a Docker container and deploy it to OpenShift for us, but we need to be logged in first.  You shoule be logged into OpenShift, and you can verify by typing the following into your terminal:
+
+```bash
+
+oc whoami
+
+```
+
+OpenShit will return your username.  If you do not have your username returned open the OpenShift console in a browser and copy the login command by clicking on your name in the top right and choosing, "Copy Login Command."
 
 ![](./images/4-1/04-copy_login_command.png)  
 
@@ -108,8 +118,6 @@ Paste and enter the command into your terminal
 
 ![](./images/4-1/vscode-03-login.png)  
 
-
-#### Build and deploy to OpenShift
 
 Now we can deploy our app.  From the terminal run the following maven command:
 
@@ -119,9 +127,10 @@ mvn clean fabric8:deploy -Popenshift
 
 ```
 
-This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
+This build will take longer because we are building Docker containers in addition to our Vert.x application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
 ```bash
+
 [INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -129,6 +138,7 @@ This build will take longer because we are building Docker containers in additio
 [INFO] Total time:  06:40 min
 [INFO] Finished at: 2019-04-24T12:49:12-04:00
 [INFO] ------------------------------------------------------------------------
+
 ```
 ### Verify OpenShift deployment
 
@@ -138,7 +148,7 @@ You should see your pod running in OpenShift, and clicking on the url should dis
 
 ![](./images/lab3/lab-03-vertx-05-ocp_greeting.png)  
 
-##  Create Noun Rest Service
+##  Create an Insult Rest Service
 
 Now that we got an understanding of how to build our application and deploy it to OpenShift it's time to implement some actual functionality.  We need a REST endpoint that returns a noun.
 
@@ -162,7 +172,7 @@ The Vertx Unit Api borrows from existing test frameworks like JUnit or QUnit and
 
 Let's get started wiht asynchronous testing.  Create a TestCase, "NounEndpointTest" in the "com.redhat.summit2019" package.  The test case will make an asynchronous call to our Noun endpoint and verify that we get a result.
 
-Add the following content to the NounEndpointTest class:
+Add the following content to the InsultEndpointTest class:
 
 ```java
 
@@ -191,7 +201,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(VertxUnitRunner.class)
-public class NounndpointTest {
+public class InsultEndpointTest {
 
     private static final int PORT = 8081;
 
@@ -214,15 +224,15 @@ public class NounndpointTest {
     }
 
     @Test
-    public void callAdjectiveEndpoint(TestContext context) {
+    public void callInsultEndpoint(TestContext context) {
         // Send a request and get a response
         Async async = context.async();
-        client.get(PORT, "localhost", "/api/noun")
+        client.get(PORT, "localhost", "/api/insult")
             .send(resp -> {
                 context.assertTrue(resp.succeeded());
                 context.assertEquals(resp.result().statusCode(), 200);
-                String adjective = resp.result().bodyAsJsonObject().getString("noun");
-                Assert.assertNotNull(adjective);
+                String insult = resp.result().bodyAsJsonObject().getString("insult");
+                context.assertNotNull(insult);
                 async.complete();
             });
     }
@@ -257,7 +267,7 @@ There are also 2 import things to take note of in the test mthod:
 ```java
 
     @Test
-    public void callNounEndpoint(TestContext context) {
+    public void callInsultEndpoint(TestContext context) {
         // Send a request and get a response
         ...
     }
@@ -269,10 +279,10 @@ There are also 2 import things to take note of in the test mthod:
 ```java
 
     @Test
-    public void callNounEndpoint(TestContext context) {
+    public void callInsultEndpoint(TestContext context) {
         // Send a request and get a response
         Async async = context.async();
-        client.get(PORT, "localhost", "/api/noun")
+        client.get(PORT, "localhost", "/api/insult")
             .send(resp -> {
                 
                 ...
@@ -287,7 +297,7 @@ There are also 2 import things to take note of in the test mthod:
 
 ```java
 
-        client.get(PORT, "localhost", "/api/noun")
+        client.get(PORT, "localhost", "/api/insult")
             .send(resp -> {
 
                 ...
@@ -310,7 +320,7 @@ Run the test either by Clicking the "Run Test" link in the IDE (just under the @
 
 ```bash
 
-mvn clean test -Dtest=NounEndpointTest
+mvn clean test -Dtest=InsultEndpointTest
 
 ```
 
@@ -324,10 +334,10 @@ The Vertx Web module makes it easy to build webapps, but we are only implementin
 
 ```java
 
-  private void nounHandler(RoutingContext rc) {
+  private void insultHandler(RoutingContext rc) {
 
     JsonObject response = new JsonObject()
-            .put("noun", "coxcomb");
+            .put("insult", "{\"insult\":\"Verily, ye be a puking, beslubbering pantaloon!\"}");
 
     rc.response()
             .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
@@ -335,6 +345,8 @@ The Vertx Web module makes it easy to build webapps, but we are only implementin
   }
 
 ```
+
+This method will temporarily enable us to pass our test because we are hardcoding the expected result.  We will fix that shortly.
 
 ##### RoutingContext 
 
@@ -354,7 +366,7 @@ We will add the following route on line 22 just after the existing route for "/a
 
 ```java
 
-    router.get("/api/noun").handler(this::nounHandler);
+    router.get("/api/insult").handler(this::insultHandler);
 
 ```
 
@@ -383,7 +395,7 @@ public class HttpApplication extends AbstractVerticle {
     Router router = Router.router(vertx);
 
     router.get("/api/greeting").handler(this::greeting);
-    router.get("/api/noun").handler(this::nounHandler);
+    router.get("/api/insult").handler(this::InsultHandler);
     router.get("/*").handler(StaticHandler.create());
 
     // Create the HTTP server and pass the "accept" method to the request handler.
@@ -401,10 +413,10 @@ public class HttpApplication extends AbstractVerticle {
 
   }
 
-  private void nounHandler(RoutingContext rc) {
+  private void insultHandler(RoutingContext rc) {
 
     JsonObject response = new JsonObject()
-            .put("noun", "coxcomb");
+            .put("insult", "{\"insult\":\"Verily, ye be a puking, beslubbering pantaloon!\"}");
 
     rc.response()
             .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
@@ -433,47 +445,54 @@ Re-run the test case and verify that it passes.
 
 ```bash
 
-mvn clean test -Dtest=NounEndpointTest
+mvn clean test -Dtest=InsultEndpointTest
 
 ```
 
-The test should pass, but we aren't actually doing anything.  Let's load the nouns into memory and return a random one from our handler method.
+The test should pass, but we aren't actually doing anything.  Let's call the existing endpoints to get a result.
 
-#### Loading the adjectives
-
-Let's create a method to load the content of the nouns.txt file:
+#### Calling the Adjective and Noun services
 
 ```java
 
-  private Future<Void> loadNouns() {
+    private void insultHandler(RoutingContext rc) {
 
-    if (nouns == null) {
-      nouns = new ArrayList<>();
+        Single<JsonObject> noun = webClient
+                .get(config().getInteger("noun.port"), config().getString("noun.url"),"/api/noun")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println("noun" + r.bodyAsString()))
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single<JsonObject> adj1 = webClient
+                .get(config().getInteger("adjective.port"), config().getString("adjective.url"), "/api/adjective")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println("adj1" + r.bodyAsString()))
+                .delay(700, TimeUnit.MILLISECONDS)
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single<JsonObject> adj2 = webClient
+                .get(config().getInteger("adjective.port"), config().getString("adjective.url"), "/api/adjective")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println("adj2" + r.bodyAsString()))
+                .delay(700, TimeUnit.MILLISECONDS)
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single.zip(
+                adj1.doOnError(error -> error(rc, error)),
+                adj2.doOnError(error -> error(rc, error)),
+                noun.doOnError(error -> error(rc, error)),
+                Insult::new)
+                .subscribe(r ->
+                rc.response()
+                        .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                        .end(r.toString()));
     }
-
-    Future<Void> future = Future.future();
-
-    try {
-      InputStream is = this.getClass().getClassLoader().getResourceAsStream("nouns.txt");
-      if (is != null) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        reader.lines()
-                .forEach(n -> nouns.add(new Noun(n.trim())));
-      }
-      future.complete();
-    } catch (Exception e) {
-      e.printStackTrace();
-      future.fail(e.getCause());
-    }
-
-    return future;
-  }
 
 ```
 
-##### Vertx Futures
+##### rxJava Single
 
-Most of this method is pretty standard stuff; however, the use of Vertx Futures is probably new:
+Unles you have used rxJava before this method probably looks strange.  A "Single"
 
 ```java
 
@@ -507,7 +526,7 @@ Let's extract the code that creates the HttpServer into its' own method that ret
     Router router = Router.router(vertx);
 
     router.get("/api/greeting").handler(this::greeting);
-    router.get("/api/noun").handler(this::adjectiveHandler);
+    router.get("/api/Insult").handler(this::adjectiveHandler);
     router.get("/*").handler(StaticHandler.create());
 
     // Create the HTTP server and pass the "accept" method to the request handler.
