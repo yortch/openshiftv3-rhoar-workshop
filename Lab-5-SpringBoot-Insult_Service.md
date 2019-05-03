@@ -503,7 +503,7 @@ import org.springframework.web.client.RestTemplate;
 public class AdjectiveService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String adjectiveHost = System.getProperty("adjective.host", "http://insult-adjective:8080");
+    private final String adjectiveHost = System.getProperty("adjective.host", "http://insult-adjectives:8080");
 
     public Adjective getAdjective() {
         return restTemplate.getForObject(adjectiveHost + "/api/adjective", Adjective.class);
