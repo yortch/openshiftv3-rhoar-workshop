@@ -71,10 +71,10 @@ Open the pom.xml file and change the artifactId, name, and description (lines 25
 
 ```xml
 
-  <artifactId>insult-adjectives</artifactId>
-  <version>1.0.0</version>
-  <name>Spring Boot Insult Adjective Service</name>
-  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
+25  <artifactId>insult-adjectives</artifactId>
+26  <version>1.0.0</version>
+27  <name>Spring Boot Insult Adjective Service</name>
+28  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
 
 ```
 
