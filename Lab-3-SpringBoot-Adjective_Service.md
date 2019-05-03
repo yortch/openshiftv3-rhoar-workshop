@@ -41,7 +41,7 @@ Log into your OpenShift console if you haven't already.  Create a new project fr
 
 #####  Clone the repository 
 
-`git clone https://github.com/jeremyrdavis/smart-appliance.git`
+`git clone https://github.com/jeremyrdavis/insult-starter-springboot`
 
 ##### Download the project zip file
 
