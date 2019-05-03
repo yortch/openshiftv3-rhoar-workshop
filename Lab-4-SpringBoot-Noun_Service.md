@@ -1,7 +1,6 @@
-# 4.2-RHOAR-SpringBoot-Lab-2-Noun-Service
+# Lab 4: Creating a SpringBoot Noun Service
 
 ## Create Noun Spring Rest Service  
-
 
 ###  Clone the repository 
 

@@ -17,20 +17,38 @@ http://www.literarygenius.info/a1-shakespearean-insults-generator.htm
 
 ```bash
 
-git clone https://github.com/jeremyrdavis/shiny-elk.git`
+git clone https://github.com/jeremyrdavis/insult-starter-springboot
 
 ```
 
 ### Or download the project zip file
 
-Download the zip file from Github by opening https://github.com/jeremyrdavis/wooly-cucumber-zip and choosing, "Download ZIP" from the green, "Clone or Download" button
+Download the zip file from Github by opening https://github.com/jeremyrdavis/insult-starter-springboot and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/4-1/github-download_zip.png)  
 
-### Import the app into VS Code
+##### Rename the Folder
+Rename the folder from "insult-starter-springboot" to "noun-service"
+
+##### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
+##### Update the project settings
+
+We need to update our project's settings from the default starter app to the adjective service we are building.
+
+Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
+"shakespearean-insults," "Spring Boot Sha Nouns Service," and "Spring Boot Noun Service for Shakespearean Insults Workshop."
+
+```xml
+
+25  <artifactId>shakespearean-insults</artifactId>
+26  <version>1.0.0</version>
+27  <name>Spring Boot Shakespearean Insults Service</name>
+28  <description>Spring Boot Insults Service for Shakespearean Insults Workshop</description>
+
+```
 
 ### Build the app
 
@@ -140,15 +158,14 @@ We will take the same, test-driven approach to building the Insult Service that 
 
 ### Create and fail a JUnit Test for our endpoint
 
-1. Create a new test class, InsultServiceTest.java
-
-Enter the following content:
+1. Create a new test class, "InsultServiceTest.java," in the "com.redhat.summit2019" package of the test directory with the following content:
 
 ```java
 
-package io.openshift.booster;
+package com.redhat.summit2019;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -214,15 +231,17 @@ We are only returning a String and don't really need a domain model, but to be c
 
 Create classes for our three models, "Adjective," "Noun," and "Insult."
 
-You may be wondering why we are re-creating the Adjective and Noun classes instead of using the ones we created earlier.  The answer is that we don't want any dependencies across Services.
+You may be wondering why we are re-creating the Adjective and Noun classes instead of using the ones we created earlier.  The answer is that we don't want any dependencies across our Services.
 
-"Insult" in the package, "io.openshift.booster.insults.model"
+##### Insult domain model
+
+First create a new folder under "src/main/java/com/redhat/summit2019" named, "model."  Second create a class, "Insult," in the package, "com.redhat.summit2019.model"
 
 Our Insult model will contain 2 Adjectives and 1 Noun and will return an insult in the format of "Verily, ye be a cockle-brained, puking measle!"  
 
 ```java
 
-package io.openshift.booster.model;
+package com.redhat.summit2019.model;
 
 public class Insult {
 
@@ -298,7 +317,7 @@ We also need Adjective and Noun domain models for our Insult to compile.  Create
 
 ```java
 
-package io.openshift.booster.model;
+package com.redhat.summit2019.model;
 
 import java.util.Objects;
 
@@ -353,7 +372,7 @@ and Noun:
 
 ```java
 
-package io.openshift.booster.model;
+package com.redhat.summit2019.model;
 
 import java.util.Objects;
 
@@ -414,11 +433,11 @@ The application should compile and build with no problems.
 
 #### Create the Insult Service
 
-Now that we have modeled our domain we can build our service.  Create a class, "InsultService," in the "io.openshift.booster.service" package with the following code:
+Now that we have modeled our domain we can build our service.  Create a class, "InsultService," in the "com.redhat.summit2019.service" package with the following code:
 
 ```java
 
-package io.openshift.booster.service;
+package com.redhat.summit2019.service;
 
 import io.openshift.booster.model.Adjective;
 import io.openshift.booster.model.Insult;
@@ -474,9 +493,9 @@ The services are essentially the same with each one handling a single REST call 
 
 ```java
 
-package io.openshift.booster.service;
+package com.redhat.summit2019.service;
 
-import io.openshift.booster.model.Adjective;
+import com.redhat.summit2019.model.Adjective;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -498,9 +517,9 @@ and
 
 ```java
 
-package io.openshift.booster.service;
+package com.redhat.summit2019.service;
 
-import io.openshift.booster.model.Noun;
+import com.redhat.summit2019.model.Noun;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -576,12 +595,12 @@ Let's add this functionality by replacing or update the existing InsultServiceTe
 
 ```java
 
-package io.openshift.booster;
+package com.redhat.summit2019;
 
-import io.openshift.booster.model.Adjective;
-import io.openshift.booster.model.Noun;
-import io.openshift.booster.service.AdjectiveService;
-import io.openshift.booster.service.NounService;
+import com.redhat.summit2019.model.Adjective;
+import com.redhat.summit2019.model.Noun;
+import com.redhat.summit2019.service.AdjectiveService;
+import com.redhat.summit2019.service.NounService;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.Before;
@@ -641,7 +660,7 @@ public class InsultServiceTest {
            .extract().response();
         assertNotNull(response);
 
-        assertEquals("{\"insult\":\"Verily, ye be a puking, cockle-brained pantaloon\"}", response.body().asString());
+        assertEquals("{\"insult\":\"Verily, ye be a puking, cockle-brained pantaloon!\"}", response.body().asString());
     }
 
     protected String baseURI() {
@@ -649,7 +668,6 @@ public class InsultServiceTest {
     }
 
 }
-
 ``` 
 
 Run the test from your terminal with:
