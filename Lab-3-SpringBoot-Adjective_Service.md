@@ -163,7 +163,7 @@ This build will take longer because we are building Docker containers in additio
 
 ##### Validating the deployment:  
 
-1. Login to OpenShift Console - with user admin/admin
+1. Login to OpenShift Console - with user userXX/r3dh4t1!
 2. Click on Project ‘red-hat-summit-2019’ if you are not already in that project
 3. You should see 1 running pod and a url that you can access
 4. Try the url
