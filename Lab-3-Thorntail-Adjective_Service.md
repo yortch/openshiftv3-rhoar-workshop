@@ -39,15 +39,18 @@ Open Visual Studio Code, choose "Open," and navigate to the root folder of the p
 
 We need to update our project's settings from the default starter app to the adjective service we are building.
 
-Open the pom.xml file and change the artifactId, name, and description to 
-"insult-adjectives," "Spring Boot Insult Adjective Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
+Open the pom.xml file and change the artifactId and name to 
+"insult-adjectives," and "Thorntail Adjective Service."
 
 ```xml
 
-  <artifactId>insult-adjectives</artifactId>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.summit2019</groupId>
+  <artifactId>adjective-service</artifactId>
   <version>1.0.0</version>
-  <name>Spring Boot Insult Adjective Service</name>
-  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
+  <packaging>war</packaging>
+  <name>Thorntail Adjective Service</name>
 
 ```
 
@@ -96,14 +99,14 @@ or into the terminal in Visual Studio Code:
 
 ```bash
 
- oc project red-hat-summit-insults
+ oc project red-hat-summit-insults-userXX
 
 ```
 
 
 ### Building a Docker container for OpenShift
 
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 181-209:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  You can find it in the <plugins></plugins> section of the pom.xml
 
 ```xml
 
@@ -145,7 +148,9 @@ You can read more about the Fabric8 project here, http://fabric8.io/
 From the terminal run the following maven command:
 
 ```bash
+
 mvn clean fabric8:deploy -Popenshift  
+
 ```
 
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:

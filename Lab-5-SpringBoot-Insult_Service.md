@@ -506,7 +506,7 @@ public class AdjectiveService {
     private final String adjectiveHost = System.getProperty("adjective.host", "http://smart-appliance:8080");
 
     public Adjective getAdjective() {
-        return restTemplate.getForObject(adjectiveHost + "/api/adjectives", Adjective.class);
+        return restTemplate.getForObject(adjectiveHost + "/api/adjective", Adjective.class);
     }
 }
 

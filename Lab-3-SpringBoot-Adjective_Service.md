@@ -210,7 +210,7 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AdjectiveServiceTest {
 
-    private static final String ENDPOINT_PATH = "api/adjectives";
+    private static final String ENDPOINT_PATH = "api/adjective";
 
     @Value("${local.server.port}")
     private int port;
