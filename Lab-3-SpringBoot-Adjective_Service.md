@@ -41,20 +41,26 @@ Log into your OpenShift console if you haven't already.  Create a new project fr
 
 #####  Clone the repository 
 
-`git clone https://github.com/jeremyrdavis/insult-starter-springboot`
+```bash
+
+git clone https://github.com/jeremyrdavis/insult-starter-springboot
+
+```
 
 ##### Download the project zip file
 
-Download the zip file from Github by opening https://github.com/jeremyrdavis/smart-appliance-zip
+Download the zip file from Github by opening git clone https://github.com/jeremyrdavis/insult-starter-springboot
 and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/4-1/github-download_zip.png)  
 
 
+##### Rename the Folder
+Rename the folder from "insult-starter-springboot" to "adjective-service"
+
 ##### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
-
 
 ##### Build the app
 
@@ -62,7 +68,9 @@ We will use Maven to build our app.  Open a new Terminal either from the command
 
 
 ```bash
+
 mvn clean package
+
 ```
 
 The tests should all complete successfully, and you should see a success message.
@@ -79,6 +87,7 @@ The tests should all complete successfully, and you should see a success message
 We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
 
 ```xml
+
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>fabric8-maven-plugin</artifactId>
