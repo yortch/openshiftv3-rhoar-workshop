@@ -41,20 +41,42 @@ Log into your OpenShift console if you haven't already.  Create a new project fr
 
 #####  Clone the repository 
 
-`git clone https://github.com/jeremyrdavis/smart-appliance.git`
+```bash
+
+git clone https://github.com/jeremyrdavis/insult-starter-springboot
+
+```
 
 ##### Download the project zip file
 
-Download the zip file from Github by opening https://github.com/jeremyrdavis/smart-appliance-zip
+Download the zip file from Github by opening git clone https://github.com/jeremyrdavis/insult-starter-springboot
 and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/4-1/github-download_zip.png)  
 
 
+##### Rename the Folder
+Rename the folder from "insult-starter-springboot" to "adjective-service"
+
 ##### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
+##### Update the project settings
+
+We need to update our project's settings from the default starter app to the adjective service we are building.
+
+Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
+"insult-adjectives," "Spring Boot Insult Adjective Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
+
+```xml
+
+25  <artifactId>insult-adjectives</artifactId>
+26  <version>1.0.0</version>
+27  <name>Spring Boot Insult Adjective Service</name>
+28  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
+
+```
 
 ##### Build the app
 
@@ -62,7 +84,9 @@ We will use Maven to build our app.  Open a new Terminal either from the command
 
 
 ```bash
+
 mvn clean package
+
 ```
 
 The tests should all complete successfully, and you should see a success message.
@@ -79,6 +103,7 @@ The tests should all complete successfully, and you should see a success message
 We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
 
 ```xml
+
           <plugin>
             <groupId>io.fabric8</groupId>
             <artifactId>fabric8-maven-plugin</artifactId>
@@ -138,7 +163,7 @@ This build will take longer because we are building Docker containers in additio
 
 ##### Validating the deployment:  
 
-1. Login to OpenShift Console - with user admin/admin
+1. Login to OpenShift Console - with user userXX/r3dh4t1!
 2. Click on Project ‘red-hat-summit-2019’ if you are not already in that project
 3. You should see 1 running pod and a url that you can access
 4. Try the url
