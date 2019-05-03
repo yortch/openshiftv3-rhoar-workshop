@@ -62,6 +62,22 @@ Rename the folder from "insult-starter-springboot" to "adjective-service"
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
+##### Update the project settings
+
+We need to update our project's settings from the default starter app to the adjective service we are building.
+
+Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
+"insult-adjectives," "Spring Boot Insult Adjective Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
+
+```xml
+
+  <artifactId>insult-adjectives</artifactId>
+  <version>1.0.0</version>
+  <name>Spring Boot Insult Adjective Service</name>
+  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
+
+```
+
 ##### Build the app
 
 We will use Maven to build our app.  Open a new Terminal either from the command line or within Visual Studio Code by choosing, "Terminal -> New Terminal"
