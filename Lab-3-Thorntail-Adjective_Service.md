@@ -1,17 +1,8 @@
-# Lab 3:  Creating Thorntail Rest Services
-
-In this lab we will create 3 rest services based on Thorntail
-* Creating Thorntail Rest Services  
-    * Adjective Service  
-    * Noun Service  
-    * Insult Service  
-* Service Discovery  
-* Unit testing -  RestAssured  
-* Integration testing -Arquillian Cube  
+# Lab 3:  Creating a Thorntail Adjective Services
 
 ## Pre-requisites 
 
-Must have completed Labs 1 and 2. We will be using those components for following labs
+Must have Visual Studio Code, JDK 8 or above
 
 ## Get the starter project up and running
 
@@ -34,11 +25,31 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 ![](./images/4-1/github-download_zip.png)  
 
 
+##### Rename the Folder
+
+Rename the folder from "insult-starter-thorntail" to "adjective-service"
+
 ### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
 ![](./images/lab3/lab-03-thorntail-01-vscode_import.png)  
+
+##### Update the project settings
+
+We need to update our project's settings from the default starter app to the adjective service we are building.
+
+Open the pom.xml file and change the artifactId, name, and description to 
+"insult-adjectives," "Spring Boot Insult Adjective Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
+
+```xml
+
+  <artifactId>insult-adjectives</artifactId>
+  <version>1.0.0</version>
+  <name>Spring Boot Insult Adjective Service</name>
+  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
+
+```
 
 ### Build the app
 

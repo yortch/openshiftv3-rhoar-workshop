@@ -14,8 +14,8 @@ In this lab we will create 3 rest services based on SpringBoot
 
 ### Pre-requisites 
 
-Must have completed labs 1-3. We will be using those components for following labs
-
+Visual Studio Code
+JDK 8 or above
 ### Description
 
 The idea of this lab is to generate to random noun and an adjective to generate an insult. It is based on the following idea:  
@@ -32,7 +32,7 @@ The project we use will be based on the REST level 0 example application from Op
 
 ### Create a new project in OpenShift
 
-Log into your OpenShift console if you haven't already.  Create a new project from the blue, "Create Project" button on the top right of the screen.  Our example uses the name, "red-hat-summit-2019."
+Log into your OpenShift console if you haven't already.  Create a new project from the blue, "Create Project" button on the top right of the screen.  Our example uses the name, "red-hat-summit-2019-user1."  Be sure to append your username!
 
 ![](./images/4-1/01.png)  
 ![](./images/4-1/02.png)  
@@ -100,7 +100,7 @@ The tests should all complete successfully, and you should see a success message
 
 ##### Building a Docker container for OpenShift
 
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.
 
 ```xml
 
@@ -314,7 +314,7 @@ Spring Data uses a repository abstraction to reduce boilerplate database code.  
 
 In this tutorial we will use a text file instead of a database to keep things simple.  However, we will follow the Spring Data convention and create an AdjectiveRepository.
 
-Create a new package, "com.redhat.summit2019.repository," and add a new class, "AdjectiveRepositry," with the following code:
+Create a new package, "com.redhat.summit2019.repository," and add a new class, "AdjectiveRepository," with the following code:
 
 ```java
 

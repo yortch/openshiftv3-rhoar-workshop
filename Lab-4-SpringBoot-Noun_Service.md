@@ -17,12 +17,8 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/4-1/github-download_zip.png)  
 
-
 ##### Rename the Folder
 Rename the folder from "insult-starter-springboot" to "noun-service"
-
-##### Rename the Folder
-Rename the folder from "insult-starter-springboot" to "adjective-service"
 
 ##### Import the app into VS Code
 
