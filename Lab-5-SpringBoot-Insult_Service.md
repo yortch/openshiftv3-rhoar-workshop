@@ -503,7 +503,7 @@ import org.springframework.web.client.RestTemplate;
 public class AdjectiveService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String adjectiveHost = System.getProperty("adjective.host", "http://smart-appliance:8080");
+    private final String adjectiveHost = System.getProperty("adjective.host", "http://insult-adjective:8080");
 
     public Adjective getAdjective() {
         return restTemplate.getForObject(adjectiveHost + "/api/adjective", Adjective.class);
@@ -527,7 +527,7 @@ import org.springframework.web.client.RestTemplate;
 public class NounService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String nounHost = System.getProperty("noun.host", "http://wooly-cucumber:8080");
+    private final String nounHost = System.getProperty("noun.host", "http://insult-nouns:8080");
 
     public Noun getNoun() {
         return restTemplate.getForObject(nounHost + "/api/noun", Noun.class);
