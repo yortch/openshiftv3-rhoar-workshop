@@ -439,9 +439,9 @@ Now that we have modeled our domain we can build our service.  Create a class, "
 
 package com.redhat.summit2019.service;
 
-import io.openshift.booster.model.Adjective;
-import io.openshift.booster.model.Insult;
-import io.openshift.booster.model.Noun;
+import com.redhat.summit2019.model.Adjective;
+import com.redhat.summit2019.model.Insult;
+import com.redhat.summit2019.model.Noun;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
