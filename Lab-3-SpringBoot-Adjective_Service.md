@@ -361,7 +361,7 @@ public class AdjectiveRepository {
 
 ##### Create an AdjectiveService
 
-We now have everything we need to return an Adjective.  It is time to create an AdjectiveService to expose the REST endpoint.  Create a new class, "AdjectiveService," in the package, "io.openshift.booster.adjectives.service" with the following code:
+We now have everything we need to return an Adjective.  It is time to create an AdjectiveService to expose the REST endpoint.  Create a new class, "AdjectiveService," in the package, "com.redhat.summit2019.service" with the following code:
 
 
 ```java
