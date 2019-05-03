@@ -28,7 +28,7 @@ Download the zip file from Github by opening https://github.com/jeremyrdavis/ins
 ![](./images/4-1/github-download_zip.png)  
 
 ##### Rename the Folder
-Rename the folder from "insult-starter-springboot" to "noun-service"
+Rename the folder from "insult-starter-springboot" to "shakespearean-insults"
 
 ##### Import the app into VS Code
 
