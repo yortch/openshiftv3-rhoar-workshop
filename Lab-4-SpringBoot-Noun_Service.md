@@ -374,16 +374,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import com.redhat.summit2019.model.Noun;
+
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.redhat.summit2019.model.Noun;
-
-
 @Path("/")
 @Component
-
 public class NounServiceController {
    
     private final AtomicLong counter = new AtomicLong();
@@ -399,7 +397,7 @@ public class NounServiceController {
     @PostConstruct
     public void loadData() {
         try {
-            Resource resource = new ClassPathResource("noun.txt");
+            Resource resource = new ClassPathResource("nouns.txt");
             InputStream is = resource.getInputStream();
             
             if (is != null) {
