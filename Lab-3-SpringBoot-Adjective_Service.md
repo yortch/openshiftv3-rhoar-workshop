@@ -162,13 +162,13 @@ We will be following Test Driven Development in this tutorial so our first step 
 
 #### Create and fail a JUnit Test for our endpoint
 
-1. 
+1. Create a new class, "AdjectiveServiceTest," in the "src/test/java/com/redhat/summit2019" directory
 
 Enter the following content:
 
 ```java
 
-package io.openshift.booster;
+package com.redhat.summit2019;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertNotNull;
@@ -212,27 +212,28 @@ public class AdjectiveServiceTest {
 Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
 
 ```bash
-mvn clean test -Dtest=AdjectiveEndpointTest
+
+mvn clean test -Dtest=AdjectiveServiceTest
+
 ```
 
-The test should of course fail.
+The test should of course fail.  If for some reason your test passes feel free to raise your hand and ask for help.
 
 
 ### Pass our JUnit test
 
 #### Steps
 
-1. Create an Adjective domain model
-2. Create an AdjectiveRepository to retrieve    
-3. Create an AdjectiveService to return JSON
+We are only returning a String and don't really need a domain model, but we are going to pretend that we are creating a full application and create a domain model with an Adjective class.
 
 ###### Adjective domain model
 
-We are only returning a String and don't really need a domain model, but to be consistent with real applications let's create an Adjective for our domain model.  Create a class, "Adjective" in the package, "io.openshift.booster.adjectives.model"
+First create a new folder under "src/main/java/com/redhat/summit2019" named, "model."  Second create a class, "Adjective.java" in your new model package:
+
 
 ```java
 
-package io.openshift.booster.adjectives.model;
+package com.redhat.summit2019.model;
 
 import java.util.Objects;
 
@@ -288,10 +289,11 @@ Spring Data uses a repository abstraction to reduce boilerplate database code.  
 
 In this tutorial we will use a text file instead of a database to keep things simple.  However, we will follow the Spring Data convention and create an AdjectiveRepository.
 
-Create a new package, "io.openshift.booster.adjectives.repository," and add a new class, "AdjectiveRepositry," with the following code:
+Create a new package, "com.redhat.summit2019.repository," and add a new class, "AdjectiveRepositry," with the following code:
 
 ```java
-package io.openshift.booster.adjectives.repository;
+
+package com.redhat.summit2019.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -300,7 +302,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Random;
 
-import io.openshift.booster.adjectives.model.Adjective;
+import com.redhat.summit2019.model.Adjective;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -338,18 +340,19 @@ We now have everything we need to return an Adjective.  It is time to create an 
 
 
 ```java
-package io.openshift.booster.adjectives.service;
+
+package com.redhat.summit2019.service;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import io.openshift.booster.adjectives.model.Adjective;
-import io.openshift.booster.adjectives.repository.AdjectiveRepository;
+import com.redhat.summit2019.model.Adjective;
+import com.redhat.summit2019.repository.AdjectiveRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Path("/adjectives")
+@Path("/adjective")
 @Component
 public class AdjectiveService {
 
@@ -362,6 +365,7 @@ public class AdjectiveService {
         return adjectiveStore.getRandomAdjective();
     }
 }
+
 ```
 
 Re-run the test case and verify that it passes.
@@ -371,7 +375,9 @@ Re-run the test case and verify that it passes.
 From the terminal run the following maven command:
 
 ```bash
+
 mvn clean fabric8:deploy -Popenshift  
+
 ```
 
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
