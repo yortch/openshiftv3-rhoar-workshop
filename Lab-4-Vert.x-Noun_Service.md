@@ -170,7 +170,6 @@ Add the following content to the NounEndpointTest class:
 
 package com.redhat.summit2019;
 
-import com.redhat.summit2019.model.Adjective;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
@@ -193,7 +192,7 @@ import java.util.List;
 import static junit.framework.TestCase.assertTrue;
 
 @RunWith(VertxUnitRunner.class)
-public class NounndpointTest {
+public class NounEndpointTest {
 
     private static final int PORT = 8081;
 
