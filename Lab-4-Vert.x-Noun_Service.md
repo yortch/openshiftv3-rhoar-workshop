@@ -440,7 +440,15 @@ mvn clean test -Dtest=NounEndpointTest
 
 The test should pass, but we aren't actually doing anything.  Let's load the nouns into memory and return a random one from our handler method.
 
-#### Loading the adjectives
+#### Loading the nouns
+
+Let's create a List of Nouns (we will add the Noun class shortly):
+
+```java
+
+  List<Noun> nouns;
+
+```
 
 Let's create a method to load the content of the nouns.txt file:
 
