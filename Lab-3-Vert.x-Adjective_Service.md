@@ -562,6 +562,84 @@ In this method we are chaining together multiple Futures with the final result e
 2.  We have a Future "init" which combines or "composes" loading the adjectives and starting the HttpServer
 3.  As each Future completes it kicks off the next one with its' success or failure.  A single failure will prevent our application from starting
 
+##### Create an Adjective model
+
+Our last step is to create an Adjective class.  We don't really need a domain model because we are only returning a String.  But in a real application we would have a domain model so let's create a new package "com.redhat.summit2019.model" (or folder structure "src/main/java/com/redhat/summit2019/model") and a new file, "Adjective.java" in the model package:
+
+```java
+
+package com.redhat.summit2019.model;
+
+import java.util.Objects;
+
+public class Adjective {
+
+
+    private String adjective;
+
+    public Adjective() {
+    }
+
+    public Adjective(String adjective) {
+        this.adjective = adjective;
+    }
+
+    public String getAdjective() {
+        return adjective;
+    }
+
+    public Adjective adjective(String adjective) {
+        this.adjective = adjective;
+        return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Adjective adjective1 = (Adjective) o;
+        return Objects.equals(adjective, adjective1.adjective);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(adjective);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Adjective{");
+        sb.append("adjective='").append(adjective).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+}
+
+```
+
+##### Update HttpApplication
+
+Now that we have a domain model for adjectives we can return the model directly:
+
+```java
+
+  import java.util.Random;
+
+  ...
+
+  private void adjectiveHandler(RoutingContext rc){
+    rc.response()
+      .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+      .end(Json.encode(adjectives.get(new Random().nextInt(adjectives.size()))));
+  }
+
+
+```
+
+Vert.x makes it easy to marshall POJO domain objects back and forth to and from JSON.  That is exactly what we are doing in this method: getting a random Adjective from our List and returning it with the help of the Json.encode() method.
+
+##### Verify that the JUnit Test passes
 
 Re-run the test case and verify that it passes.
 
@@ -586,6 +664,7 @@ mvn clean fabric8:deploy -Popenshift
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
 ```bash
+
 [INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -593,6 +672,7 @@ This build will take longer because we are building Docker containers in additio
 [INFO] Total time:  06:40 min
 [INFO] Finished at: 2019-04-24T12:49:12-04:00
 [INFO] ------------------------------------------------------------------------
+
 ```
 #### Verify OpenShift deployment
 

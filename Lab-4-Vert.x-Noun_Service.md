@@ -42,17 +42,19 @@ Open Visual Studio Code, choose "Open," and navigate to the root folder of the p
 
 ### Update the app
 
-Our first step will be to customize the starter application.  Open the pom.xml and change lines 5, 8, and 9 to be "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
+First step: rename the directory from "insult-service-vertx" to "insult-nouns."
+
+Second open the pom.xml and change "artifactId," "name," and "description" to "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
 
 ```xml
 
-3  <modelVersion>4.0.0</modelVersion>
-4  <groupId>com.redhat.summit2019</groupId>
-5  <artifactId>insult-nouns</artifactId>
-6  <version>1.0.0</version>
-7  <packaging>jar</packaging>
-8  <name>Insult Nouns</name>
-9  <description>Red Hat Summit 2019 Insult Workshop Noun Service</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.summit2019</groupId>
+  <artifactId>insult-nouns</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>Insult Nouns</name>
+  <description>Red Hat Summit 2019 Insult Workshop Noun Service</description>
 
 ``` 
 
