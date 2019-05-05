@@ -50,13 +50,13 @@ Our first step will be to customize the starter application.  Open the pom.xml a
 
 ```xml
 
-3  <modelVersion>4.0.0</modelVersion>
-4  <groupId>com.redhat.summit2019</groupId>
-5  <artifactId>insult-adjectives</artifactId>
-6  <version>1.0.0</version>
-7  <packaging>jar</packaging>
-8  <name>Insult Adjectives</name>
-9  <description>Red Hat Summit 2019 Insult Workshop Adjectives Service</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.summit2019</groupId>
+  <artifactId>insult-adjectives</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>Vert.x Insult Adjectives Service</name>
+  <description>Red Hat Summit 2019 Insult Workshop Adjectives Service</description>
 
 ``` 
 
