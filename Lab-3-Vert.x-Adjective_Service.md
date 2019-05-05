@@ -164,7 +164,9 @@ Testing reactive, asynchronouse code is different than testing traditional, impe
 
 The Vertx Unit Api borrows from existing test frameworks like JUnit or QUnit and follows typical Vert.x practices.
 
-Let's get started wiht asynchronous testing.  Create a TestCase, "AdjectiveEndpointTest" in the "com.redhat.summit2019" package.  The test case will make an asynchronous call to our Adjective endpoint and verify that we get a result.
+Let's get started wiht asynchronous testing.  Create a TestCase, "AdjectiveEndpointTest" in the "com.redhat.summit2019" package ("src/test/com/redhat/summit2019/" folder.)  
+
+Our test case will make an asynchronous call to our Adjective endpoint and verify that we get a result.
 
 Add the following content to the AdjectiveEndpointTest class:
 
