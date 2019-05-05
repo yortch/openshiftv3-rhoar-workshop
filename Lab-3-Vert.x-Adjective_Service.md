@@ -288,7 +288,7 @@ There are also 2 import things to take note of in the test mthod:
 
 ```
 
-3.  We use the Vertx WebClient to call our endpoint
+3.  We use the Vertx WebClient to call our endpoint.  We can call any endpoint with the Vert.x WebClient.  In Lab 5 we will use it to retrieve 2 adjectives and a Noun.
 
 ```java
 
