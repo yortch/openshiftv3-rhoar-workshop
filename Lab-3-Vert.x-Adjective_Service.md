@@ -446,7 +446,14 @@ The test should pass, but we aren't actually doing anything.  Let's load the adj
 
 #### Loading the adjectives
 
-Let's create a method to load the content of the adjectives.txt file:
+Let's create a List of Adjectives (we will add the Adjective class shortly):
+
+```java
+
+  List<Adjective> adjectives;
+
+```
+and a method to load the content of the adjectives.txt file:
 
 ```java
 
@@ -547,6 +554,7 @@ Now we can put our Futures to use.  Change the start method to the following:
   }
 
 ```
+Now we have some reactive code!
 
 In this method we are chaining together multiple Futures with the final result either succeeding and starting the class or failing and preventing it from starting.
 
