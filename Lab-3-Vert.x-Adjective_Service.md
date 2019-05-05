@@ -174,7 +174,6 @@ Add the following content to the AdjectiveEndpointTest class:
 
 package com.redhat.summit2019;
 
-import com.redhat.summit2019.model.Adjective;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
