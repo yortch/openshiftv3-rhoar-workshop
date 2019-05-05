@@ -1,19 +1,27 @@
-Lab 6 Istio 
+# Lab 6 Istio
 
-Pre-requisites
+## Pre-requisites
 We will be using those components for following labs
 
 
-Prerequisites
-Istio is installed and running on OpenShift.
-Your administrator has assigned you a userid to run these samples. 
-A project has been created, and istio-injection enabled, the default service account has been given access for Istio
-If running on OpenShift, your administrator has given you a hostname to use with your application instance.
+Prerequisites +
+* Istio is installed and running on OpenShift, +
+* Your administrator has assigned you a userid +
+
+### Enable Istio for the InsultGateway  service
 
 
 
-Login with the userid (such as user1) assigned to you by the administrator.
+* Step1 - Login to openshift +
+```java
+
+oc login https://master.35b7.summit.opentlc.com/login -u $USER_ID -p $PWD
+
+```
+
+* Step 2 - Deploy gateway.yml to OpenShift +
+
+```bash
 
 
-
-
+```
