@@ -205,7 +205,26 @@ mvn clean deploy:fabric8 -Popenshift
 ``` 
 Please make sure build is successful
 
-* Step 2 - Deploy gateway.yml to OpenShift +
+``` bash
+INFO] F8: Using project: user1-insult-app
+[INFO] F8: Creating a Service from openshift.yml namespace user1-insult-app name insult-service
+[INFO] F8: Created Service: target/fabric8/applyJson/user1-insult-app/service-insult-service.json
+[INFO] F8: Creating a DeploymentConfig from openshift.yml namespace user1-insult-app name insult-service
+[INFO] F8: Created DeploymentConfig: target/fabric8/applyJson/user1-insult-app/deploymentconfig-insult-service.json
+[INFO] F8: Creating Route user1-insult-app:insult-service host: null
+[INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 01:26 min
+[INFO] Finished at: 2019-05-06T08:06:21-04:00
+[INFO] ------------------------------------------------------------------------
+
+
+```
+
+
+* Step 8 - Deploy gateway.yml to OpenShift +
 
 ```bash
 
