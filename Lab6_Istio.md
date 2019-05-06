@@ -490,10 +490,25 @@ Check the service graph on kiali at https://kiali-istio-system.apps.35b7.summit.
 
 please check your specific project , in my case it is user1-insult-app. replace user1 with your assigned userid
 
-![](./images/kaili-home-1.png) 
+![](./images/kaili-home-1.png)
 
 
 Right next to the service graph, you will see a summary of the traffic success and error rates which gives you a snapshot of the health of your microservices running on the platform
 
-![](./images/kaili-service-graph.png) 
- 
+![](./images/kaili-service-graph.png)
+
+#### Application Metrics
+
+Click on the Applications menu to get an application centric view of different microservices, their health/error rate and their inbound and outbound metrics such as Request Volume, Request Duration, Request Size, Response Size etc. These are helpful for debugging your microservices as you use them further.
+
+![](./images/kaili-app-menu.png)
+
+#### Tracing
+
+Click on Distributed Tracing	on the Kiali menu to connect to Jaeger.
+
+Note If you are not getting redirected to Jaeger, you may have to enable popups from Kiali page
+
+Jaeger provides tracing info for all the calls you made. Select a service on the left hand menu such as istio-ingressgateway or insult-service and you will see the list of traces for all your usage.
+
+![](./images/kaili-jag.png)
