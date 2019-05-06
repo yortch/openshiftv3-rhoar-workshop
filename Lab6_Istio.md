@@ -488,4 +488,12 @@ http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult
 Check the service graph on kiali at https://kiali-istio-system.apps.35b7.summit.opentlc.com . userid/password(admin/admin) You can use the Graph menu item on the left of Kiala to view this graph as below
 
 
-![](./images/kaili-home-1.png)  
+please check your specific project , in my case it is user1-insult-app. replace user1 with your assigned userid
+
+![](./images/kaili-home-1.png) 
+
+
+Right next to the service graph, you will see a summary of the traffic success and error rates which gives you a snapshot of the health of your microservices running on the platform
+
+![](./images/kaili-service-graph.png) 
+ 
