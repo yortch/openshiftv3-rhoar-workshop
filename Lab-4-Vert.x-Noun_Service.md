@@ -6,14 +6,14 @@ Must have completed labs 1-3. We will be using those components for following la
 
 ## Description
 
-The idea of this lab is to generate to random noun and an adjective to generate an insult. It is based on the following idea:  
+The idea of this lab is to generate to random noun and a noun to generate an insult. It is based on the following idea:  
 http://www.literarygenius.info/a1-shakespearean-insults-generator.htm  
 
 ## Steps
 
 1. Verify that you are logged into OpenShift
 2. Clone or download the sample project from Github
-2. Add the necessary functionality to return adjectives
+2. Add the necessary functionality to return nouns
 
 ## Verify that you are logged into OpenShift
 
@@ -44,7 +44,7 @@ Open Visual Studio Code, choose "Open," and navigate to the root folder of the p
 
 First step: rename the directory from "insult-service-vertx" to "insult-nouns."
 
-Second open the pom.xml and change "artifactId," "name," and "description" to "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
+Second open the pom.xml and change "artifactId," "name," and "description" to "insult-nouns," "Insult Nouns," and "Red Hat Summit 2019 Insult Workshop Noun Service" respectively:
 
 ```xml
 
@@ -215,15 +215,15 @@ public class NounEndpointTest {
     }
 
     @Test
-    public void callAdjectiveEndpoint(TestContext context) {
+    public void callNounEndpoint(TestContext context) {
         // Send a request and get a response
         Async async = context.async();
         client.get(PORT, "localhost", "/api/noun")
             .send(resp -> {
                 context.assertTrue(resp.succeeded());
                 context.assertEquals(resp.result().statusCode(), 200);
-                String adjective = resp.result().bodyAsJsonObject().getString("noun");
-                Assert.assertNotNull(adjective);
+                String noun = resp.result().bodyAsJsonObject().getString("noun");
+                Assert.assertNotNull(noun);
                 async.complete();
             });
     }
@@ -319,7 +319,7 @@ The test should of course fail.
 
 ### Pass our JUnit test
 
-The Vertx Web module makes it easy to build webapps, but we are only implementing a single endpoint so we will stick with basic HTTP functionality.  Open the HttpApplication class and add the following method to handle returning an adjective (we will hard code an adjective for our initial pass):
+The Vertx Web module makes it easy to build webapps, but we are only implementing a single endpoint so we will stick with basic HTTP functionality.  Open the HttpApplication class and add the following method to handle returning an noun (we will hard code an noun for our initial pass):
 
 #### Create a method to handle GET requests
 
@@ -486,7 +486,7 @@ Most of this method is pretty standard stuff; however, the use of Vertx Futures 
 
 ```java
 
-  private Future<Void> loadAdjectives() {
+  private Future<Void> loadNouns() {
 
     ...
 
@@ -503,7 +503,7 @@ Most of this method is pretty standard stuff; however, the use of Vertx Futures 
 
 Vertx Futures represent the result of an action that may, or may not, have occurred yet.  They allow us to call multiple methods and do other work while the methods execute.
 
-You probably noticed that we are blocking the event loop while reading the adjectives file.  "Don't block the event loop!" is Vert.x' cardinal rule, but in the case of initializing the app it is okay.  After all if we can't load the adjectives there is no reason for the service to start.
+You probably noticed that we are blocking the event loop while reading the noun file.  "Don't block the event loop!" is Vert.x' cardinal rule, but in the case of initializing the app it is okay.  After all if we can't load the noun there is no reason for the service to start.
 
 Let's extract the code that creates the HttpServer into its' own method that returns a Future:
 
@@ -516,7 +516,7 @@ Let's extract the code that creates the HttpServer into its' own method that ret
     Router router = Router.router(vertx);
 
     router.get("/api/greeting").handler(this::greeting);
-    router.get("/api/noun").handler(this::adjectiveHandler);
+    router.get("/api/noun").handler(this::nounHandler);
     router.get("/*").handler(StaticHandler.create());
 
     // Create the HTTP server and pass the "accept" method to the request handler.
@@ -555,9 +555,64 @@ Now we can put our Futures to use.  Change the start method to the following:
 In this method we are chaining together multiple Futures with the final result either succeeding and starting the class or failing and preventing it from starting.
 
 1.  We have a Future<Void> method in our start signature.  This will tell our class that it has successfully started or not
-2.  We have a Future "init" which combines or "composes" loading the adjectives and starting the HttpServer
+2.  We have a Future "init" which combines or "composes" loading the nouns and starting the HttpServer
 3.  As each Future completes it kicks off the next one with its' success or failure.  A single failure will prevent our application from starting
 
+###  Create Noun Model Class  
+
+Our last step is to create an Noun class.  We don't really need a domain model because we are only returning a String.  But in a real application we would have a domain model so let's create a new package "com.redhat.summit2019.model" (or folder structure "src/main/java/com/redhat/summit2019/model") and a new file, "Noun.java" in the model package:
+
+
+![](./images/4.SpringBootNoutModelClass.png)  
+
+
+````java
+
+package com.redhat.summit2019.model;
+
+import java.util.Objects;
+
+public class Noun {
+    private String noun;
+
+    public Noun() {
+    }
+
+    public Noun(String noun) {
+        this.noun = noun;
+    }
+
+    public String getNoun() {
+        return noun;
+    }
+
+    public Noun noun(String noun) {
+        this.noun = noun;
+        return this;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if ((o == null) || (getClass() != o.getClass()))
+            return false;
+        Noun noun1 = (Noun) o;
+        return Objects.equals(noun, noun);
+    }
+
+    public int hashCode() {
+        return Objects.hash(new Object[] { noun });
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Noun{");
+        sb.append("noun='").append(noun).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+}
+
+````
 
 Re-run the test case and verify that it passes.
 
