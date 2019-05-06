@@ -472,4 +472,20 @@ Client --> OpenShiftRouter--> istio-ingressgateway-->insult-app-gateway--> insul
 * insult-app-gateway receives traffic for specific application hostname (in the above case nsult-service-user1-insult-app.apps.35b7.summit.opentlc.com)
 * insult-app- virtualservice redirects the traffic to specific endpoints exposed by the application.
 
-####
+Note:  Your URLs would be different from mine. So use your values.
+
+
+
+So I can access the product page at the URL 
+
+http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult
+
+
+ hit the url a few times, so generate traffic
+
+#### Service Graph
+
+Check the service graph on kiali at https://kiali-istio-system.apps.35b7.summit.opentlc.com . userid/password(admin/admin) You can use the Graph menu item on the left of Kiala to view this graph as below
+
+
+![](./images/kaili-home.png)  
