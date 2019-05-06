@@ -284,12 +284,14 @@ spec:
           number: 8080
         host: insult-adjectives
 ```
-### Gateway: A Gateway configures a load balancer for HTTP/TCP traffic, most commonly operating at the edge of the mesh to enable ingress traffic for an application. The above gateway will direct all the HTTP traffic coming on port 80 at istio-ingressgateway to the insult application.
+### Gateway : 
+A Gateway configures a load balancer for HTTP/TCP traffic, most commonly operating at the edge of the mesh to enable ingress traffic for an application. The above gateway will direct all the HTTP traffic coming on port 80 at istio-ingressgateway to the insult application.
 
 The selector istio: ingressgateway pull the traffic coming to istio-ingressgateway service in the istio-system project
 The parameter hosts:  says that  traffic coming to this insult-app-gateway for any hostname will be consumed. If we want our application to cater to specific hostnames, we should list those here instead of using *
 
-###VirtualService: A VirtualService defines the rules that control how requests for a service are routed within an Istio service mesh. With the above virtualservice configuration:
+### VirtualService:
+ A VirtualService defines the rules that control how requests for a service are routed within an Istio service mesh. With the above virtualservice configuration:
 
 gateways: - insult-app-gateway configures it to listens to traffic coming to insult-app-gateway defined earlier
 host: "*" caters to any hostnames. If we want specific hostname, we can change this to a specific hostname.
