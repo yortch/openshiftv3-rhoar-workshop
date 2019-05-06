@@ -296,3 +296,129 @@ The parameter hosts:  says that  traffic coming to this insult-app-gateway for a
 gateways: - insult-app-gateway configures it to listens to traffic coming to insult-app-gateway defined earlier
 host: "*" caters to any hostnames. If we want specific hostname, we can change this to a specific hostname.
 URI matching allows it to listen to /insult etc.
+
+#### * Step 8.1 - Modify below gateway/virtual service config to your apps
+
+Replace all the occurances of userx with your specific assigned user id
+
+```xml
+```xml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: insult-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "insult-service-userx-insult-app.apps.35b7.summit.opentlc.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: insult-app-virtual-service
+spec:
+  hosts:
+  - "insult-service-userx-insult-app.apps.35b7.summit.opentlc.com"
+  gateways:
+  - insult-app-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/insult
+    rewrite:
+      uri: /api/insult
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-service
+  - match:
+    - uri:
+        prefix: /api/noun
+    rewrite:
+      uri: /api/noun
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-nouns
+  - match:
+    - uri:
+        prefix: /api/adjective
+    rewrite:
+      uri: /api/adjective
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-adjectives
+```
+Example: Below is the gateway config for user1 (replace user1 with ur USER_ID)
+
+
+```xml
+```xml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: insult-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "insult-service-user1-insult-app.apps.35b7.summit.opentlc.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: insult-app-virtual-service
+spec:
+  hosts:
+  - "insult-service-user1-insult-app.apps.35b7.summit.opentlc.com"
+  gateways:
+  - insult-app-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/insult
+    rewrite:
+      uri: /api/insult
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-service
+  - match:
+    - uri:
+        prefix: /api/noun
+    rewrite:
+      uri: /api/noun
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-nouns
+  - match:
+    - uri:
+        prefix: /api/adjective
+    rewrite:
+      uri: /api/adjective
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-adjectives
+
+```
+
