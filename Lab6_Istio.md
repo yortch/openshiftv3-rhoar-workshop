@@ -512,3 +512,71 @@ Note If you are not getting redirected to Jaeger, you may have to enable popups 
 Jaeger provides tracing info for all the calls you made. Select a service on the left hand menu such as istio-ingressgateway or insult-service and you will see the list of traces for all your usage.
 
 ![](./images/kaili-jag.png)
+
+#### Destination Rules
+
+
+We have the Insult  application running now. Let's apply some destination rules  that will allow us to shape traffic according to the subsets we define in these rules.
+
+A DestinationRule configures the set of policies to be applied to a request after VirtualService routing has occurred.
+
+Let us first look at these destination rules. These are three rules applies to /api/insult, /api/noun, and /api/adjective. The rules define subsets based on the version labels. These subsets will be used in the future labs for traffic shaping
+
+Create a file called destinationRule-insult.yml in the location of your choice.
+
+```xml
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: insult-service
+spec:
+  host: insult-service
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: 1.0.0
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: insult-nouns
+spec:
+  host: insult-nouns
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: insult-adjectives
+spec:
+  host: insult-adjectives
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+  - name: v1
+    labels:
+      version: 1.0.0
+
+
+```
+
+Let us now apply these labels by running. replace USER_PROJECT with the assigned user project
+
+```bash
+oc apply -f destinationRule-insult.yml -n {USER-PROJECT}
+```
+
+Get back to Kiala menu option Istio Config on the left to find these destination rules. Istio Config can be used to view all the rules applied on the traffic at any point of time.
