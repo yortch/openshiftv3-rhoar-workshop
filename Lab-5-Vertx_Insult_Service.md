@@ -36,25 +36,27 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/lab3/lab-03-vertx-02-browser_clone_download.png)  
 
+## Rename the directory
+
+First step: rename the directory from "insult-service-vertx" to "shakespearean-insults."
+
 ## Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
 ### Update the app
 
-Rename the cloned or unzipped folder to "shakespearean-insults."
-
-Our first step will be to customize the starter application.  Open the pom.xml and change lines 5, 8, and 9 to be "insult-adjectives," "Insult Adjectives," and "Red Hat Summit 2019 Insult Workshop Adjectives Service" respectively:
+Second open the pom.xml and change "artifactId," "name," and "description" to "shakespearean-insults," "Shakespearean Insults," and "Red Hat Summit 2019 Shakespearean Insult Workshop" respectively:
 
 ```xml
 
-3  <modelVersion>4.0.0</modelVersion>
-4  <groupId>com.redhat.summit2019</groupId>
-5  <artifactId>shakespearean-insults</artifactId>
-6  <version>1.0.0</version>
-7  <packaging>jar</packaging>
-8  <name>Shakespearean Insults</name>
-9  <description>Red Hat Summit 2019 Insult Workshop Insult Service</description>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.summit2019</groupId>
+  <artifactId>shakespearean-insults</artifactId>
+  <version>1.0.0</version>
+  <packaging>jar</packaging>
+  <name>Shakespearean Insults</name>
+  <description>Red Hat Summit 2019 Shakespearean Insult Workshop</description>
 
 ``` 
 
@@ -178,7 +180,6 @@ Add the following content to the InsultEndpointTest class:
 
 package com.redhat.summit2019;
 
-import com.redhat.summit2019.model.Adjective;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.AsyncFile;
@@ -328,7 +329,7 @@ The test should of course fail.
 
 ### Pass our JUnit test
 
-The Vertx Web module makes it easy to build webapps, but we are only implementing a single endpoint so we will stick with basic HTTP functionality.  Open the HttpApplication class and add the following method to handle returning an adjective (we will hard code an adjective for our initial pass):
+The Vertx Web module makes it easy to build webapps, but we are only implementing a single endpoint so we will stick with basic HTTP functionality.  Open the HttpApplication class and add the following method to handle returning an insult (we will hard code an insult for our initial pass):
 
 #### Create a method to handle GET requests
 
@@ -346,7 +347,8 @@ The Vertx Web module makes it easy to build webapps, but we are only implementin
 
 ```
 
-This method will temporarily enable us to pass our test because we are hardcoding the expected result.  We will fix that shortly.
+This method will temporarily enable us to pass our test because we are hardcoding the expected result.  We will fix that shortly, but first we will update our test case.
+
 
 ##### RoutingContext 
 
@@ -362,7 +364,7 @@ Vert.x' JsonObject encapsulates the notion of a JSON Object and makes it extreme
 
 #### Add the route
 
-We will add the following route on line 22 just after the existing route for "/api/greeting":
+We will add the following route just after the existing route for "/api/greeting":
 
 ```java
 
@@ -395,7 +397,7 @@ public class HttpApplication extends AbstractVerticle {
     Router router = Router.router(vertx);
 
     router.get("/api/greeting").handler(this::greeting);
-    router.get("/api/insult").handler(this::InsultHandler);
+    router.get("/api/insult").handler(this::insultHandler);
     router.get("/*").handler(StaticHandler.create());
 
     // Create the HTTP server and pass the "accept" method to the request handler.
@@ -451,7 +453,250 @@ mvn clean test -Dtest=InsultEndpointTest
 
 The test should pass, but we aren't actually doing anything.  Let's call the existing endpoints to get a result.
 
+#### Update our Test Case
+
+We will refactor our HttpApplication to get the port numbers and urls from the application's configuration.  Update the "before method" and add your existing OpenShift url's:
+
+```java
+
+        vertx.deployVerticle(HttpApplication.class.getName(),
+                new DeploymentOptions().setConfig(
+                        new JsonObject()
+                                .put("http.port", PORT)
+                                .put("adjective.url", "insult-adjectives-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
+                                .put("noun.url", "insult-starter-vertx-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
+                ),
+                context.asyncAssertSuccess());
+
+```
+
+The complete class should be:
+
+```java
+
+package com.redhat.summit2019;
+
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Vertx;
+import io.vertx.core.file.AsyncFile;
+import io.vertx.core.file.OpenOptions;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.parsetools.RecordParser;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
+import io.vertx.ext.unit.junit.VertxUnitRunner;
+import io.vertx.ext.web.client.WebClient;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static junit.framework.TestCase.assertTrue;
+
+@RunWith(VertxUnitRunner.class)
+public class InsultEndpointTest {
+
+    private static final int PORT = 8081;
+
+    private Vertx vertx;
+    private WebClient client;
+
+    @Before
+    public void before(TestContext context) {
+        vertx = Vertx.vertx();
+        vertx.exceptionHandler(context.exceptionHandler());
+        vertx.deployVerticle(HttpApplication.class.getName(),
+                new DeploymentOptions().setConfig(
+                        new JsonObject()
+                                .put("http.port", PORT)
+                                .put("adjective.url", "insult-adjectives-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
+                                .put("noun.url", "insult-starter-vertx-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
+                ),
+                context.asyncAssertSuccess());
+        client = WebClient.create(vertx);
+    }
+
+    @After
+    public void after(TestContext context) {
+        vertx.close(context.asyncAssertSuccess());
+    }
+
+    @Test
+    public void callInsultEndpoint(TestContext context) {
+        // Send a request and get a response
+        Async async = context.async();
+        client.get(PORT, "localhost", "/api/insult")
+            .send(resp -> {
+                context.assertTrue(resp.succeeded());
+                context.assertEquals(resp.result().statusCode(), 200);
+                String insult = resp.result().bodyAsJsonObject().getString("insult");
+                context.assertNotNull(insult);
+                async.complete();
+            });
+    }
+}
+
+````
+
 #### Calling the Adjective and Noun services
+
+Time for some major changes (and reactive code.) 
+
+####  Create our Domain Model
+
+We are only returning a String and don't really need a domain model, but to be consistent with the rest of the tutorial and of course real applications we will create a domain model for our application.  
+
+Create a new package "com.redhat.summit2019.model" (or folder structure "src/main/java/com/redhat/summit2019/model") and a new file, "Insult.java" in the model package.
+
+Our Insult model will contain 2 Adjectives and 1 Noun and will return an insult in the format of "Verily, ye be a cockle-brained, puking measle!"  
+
+```java
+
+package com.redhat.summit2019.model;
+
+import io.vertx.core.json.JsonObject;
+
+public class Insult {
+
+    String adjective1;
+
+    String adjective2;
+
+    String noun;
+
+    public Insult(String adjective1, String adjective2, String noun) {
+        this.adjective1 = adjective1;
+        this.adjective2 = adjective2;
+        this.noun = noun;
+    }
+
+    public Insult(JsonObject adjective1, JsonObject adjective2, JsonObject noun) {
+        this.adjective1 = adjective1.getString("adjective");
+        this.adjective2 = adjective2.getString("adjective");
+        ;
+        this.noun = noun.getString("noun");
+    }
+
+    public String getInsult() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Verily, ye be a ");
+        builder.append(adjective1);
+        builder.append(", ");
+        builder.append(adjective2);
+        builder.append(" ");
+        builder.append(noun);
+        builder.append("!");
+        return builder.toString();
+    }
+
+    public Insult() {
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("\"insult\":\"");
+        builder.append(getInsult());
+        builder.append("\"");
+        builder.append("}");
+        return builder.toString();
+
+    }
+
+    public String getAdjective1() {
+        return adjective1;
+    }
+
+    public void setAdjective1(String adjective1) {
+        this.adjective1 = adjective1;
+    }
+
+    public String getAdjective2() {
+        return adjective2;
+    }
+
+    public void setAdjective2(String adjective2) {
+        this.adjective2 = adjective2;
+    }
+}
+```
+
+##### Change our imported classes
+
+The first thing we need to do is to swap out a lot of our imports. Replace the "io.vertx.core" and "io.vertx.ext" packages with "io.vertx.reactivex.core" and "io.vertx.reactivex.ext" for the following import statements:
+
+```java
+
+import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.ext.web.Router;
+import io.vertx.reactivex.ext.web.RoutingContext;
+import io.vertx.reactivex.ext.web.client.HttpResponse;
+import io.vertx.reactivex.ext.web.client.WebClient;
+import io.vertx.reactivex.ext.web.handler.StaticHandler;
+
+```
+
+##### Add a WebClient
+
+Create a Vert.x WebClient member variable.  This is the same utility that we have used in our tests (we mentioned earlier that it is used for more than tests.)  And instantiate it in the "start" method:
+
+```java
+
+  WebClient webClient;
+
+    @Override
+    public void start(Future<Void> future) {
+
+        webClient = WebClient.create(vertx);
+
+        ...
+
+```
+
+##### Update the start method
+
+We need to initialize the webClient and update our start method be fit with the reactive superclass.  Remove the "@Override" annotation.
+
+```java
+
+  public void start(Future<Void> future) {
+
+    webClient = WebClient.create(vertx);
+
+    // Create a router object.
+    Router router = Router.router(vertx);
+
+    router.get("/api/greeting").handler(this::greeting);
+    router.get("/api/insult").handler(this::insultHandler);
+    router.get("/*").handler(StaticHandler.create());
+
+    // Create the HTTP server and pass the "accept" method to the request handler.
+    vertx
+        .createHttpServer()
+        .requestHandler(router)
+        .listen(
+            // Retrieve the port from the configuration, default to 8080.
+            config().getInteger("http.port", 8080), ar -> {
+                if (ar.succeeded()) {
+                  System.out.println("Server started on port " + ar.result().actualPort());
+                  future.complete();
+                }else{
+                  future.fail(ar.cause());
+                }
+              });
+
+  }
+
+```
+
+##### Call our Microservices
+
+Swap out our stubbed out "insultHandler" method in "HttpApplication" with the following code.  Don't worry if it looks odd; we will unpack it later.
 
 ```java
 
@@ -492,81 +737,141 @@ The test should pass, but we aren't actually doing anything.  Let's call the exi
 
 ##### rxJava Single
 
-Unles you have used rxJava before this method probably looks strange.  A "Single"
+Unles you have used rxJava before this method probably looks strange.  A "Single" ...
 
 ```java
 
-  private Future<Void> loadAdjectives() {
-
-    ...
-
-    Future<Void> future = Future.future();
-
-    ...
-
-      future.complete();
-    ...
-
-      future.fail(e.getCause());
+       Single<JsonObject> noun = webClient
+                .get(config().getInteger("noun.port"), config().getString("noun.url"),"/api/noun")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println("noun" + r.bodyAsString()))
+                .map(HttpResponse::bodyAsJsonObject);
 
 ```
 
-Vertx Futures represent the result of an action that may, or may not, have occurred yet.  They allow us to call multiple methods and do other work while the methods execute.
-
-You probably noticed that we are blocking the event loop while reading the adjectives file.  "Don't block the event loop!" is Vert.x' cardinal rule, but in the case of initializing the app it is okay.  After all if we can't load the adjectives there is no reason for the service to start.
-
-Let's extract the code that creates the HttpServer into its' own method that returns a Future:
+##### Add a method to handle errors
 
 ```java
 
-  private Future<Void> startHttpServer(){
-    Future<Void> future = Future.future();
+    private void error(RoutingContext rc, Throwable error){
+        rc.response()
+                .setStatusCode(500)
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(new JsonObject().put("error", error.getMessage()).encodePrettily());
+    }
 
-    // Create a router object.
-    Router router = Router.router(vertx);
-
-    router.get("/api/greeting").handler(this::greeting);
-    router.get("/api/Insult").handler(this::adjectiveHandler);
-    router.get("/*").handler(StaticHandler.create());
-
-    // Create the HTTP server and pass the "accept" method to the request handler.
-    vertx
-      .createHttpServer()
-      .requestHandler(router)
-      .listen(
-              // Retrieve the port from the configuration, default to 8080.
-              config().getInteger("http.port", 8080), ar -> {
-                if (ar.succeeded()) {
-                  System.out.println("Server started on port " + ar.result().actualPort());
-                  future.complete();
-                }else{
-                  future.fail(ar.cause());
-                }
-              });
-
-    return future;
-  }
 
 ```
 
-This code is almost identical to the previous method except for the addition of a Vert.x Future.
-
-Now we can put our Futures to use.  Change the start method to the following:
+The entire class should look like the following:
 
 ```java
 
-  @Override
-  public void start(Future<Void> startFuture) {
-    Future init = loadNouns().compose(v -> startHttpServer()).setHandler(startFuture.completer());
-  }
+package com.redhat.summit2019;
+
+import com.redhat.summit2019.model.Insult;
+import io.reactivex.Single;
+import io.reactivex.functions.Consumer;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.ext.web.Router;
+import io.vertx.reactivex.ext.web.RoutingContext;
+import io.vertx.reactivex.ext.web.client.HttpResponse;
+import io.vertx.reactivex.ext.web.client.WebClient;
+import io.vertx.reactivex.ext.web.handler.StaticHandler;
+
+import static io.vertx.core.http.HttpHeaders.CONTENT_TYPE;
+
+public class HttpApplication extends AbstractVerticle {
+
+    static final String template = "Hello, %s!";
+
+    WebClient webClient;
+
+    @Override
+    public void start(Future<Void> future) {
+
+        webClient = WebClient.create(vertx);
+
+        // Create a router object.
+        Router router = Router.router(vertx);
+
+        router.get("/api/greeting").handler(this::greeting);
+        router.get("/api/insult").handler(this::insultHandler);
+        router.get("/*").handler(StaticHandler.create());
+
+        // Create the HTTP server and pass the "accept" method to the request handler.
+        vertx
+                .createHttpServer()
+                .requestHandler(router)
+                .listen(
+                        // Retrieve the port from the configuration, default to 8080.
+                        config().getInteger("http.port", 8080), ar -> {
+                            if (ar.succeeded()) {
+                                System.out.println("Server started on port " + ar.result().actualPort());
+                            }
+                            future.handle(ar.mapEmpty());
+                        });
+
+    }
+
+    private void insultHandler(RoutingContext rc) {
+
+        Single<JsonObject> noun = webClient
+                .get(80, NOUN_HOST,"/api/noun")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println((r.bodyAsString())))
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single<JsonObject> adj1 = webClient
+                .get(80, ADJECTIVE_HOST, "/api/adjective")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println(r.bodyAsString()))
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single<JsonObject> adj2 = webClient
+                .get(80, ADJECTIVE_HOST, "/api/adjective")
+                .rxSend()
+                .doOnSuccess(r -> System.out.println(r.bodyAsString()))
+                .map(HttpResponse::bodyAsJsonObject);
+
+        Single.zip(
+                adj1.doOnError(error -> error(rc, error)),
+                adj2.doOnError(error -> error(rc, error)),
+                noun.doOnError(error -> error(rc, error)),
+                Insult::new)
+                .subscribe(r ->
+                rc.response()
+                        .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                        .end(r.toString()));
+    }
+
+    private void error(RoutingContext rc, Throwable error){
+        rc.response()
+                .setStatusCode(500)
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(new JsonObject().put("error", error.getMessage()).encodePrettily());
+    }
+
+
+    private void greeting(RoutingContext rc) {
+        String name = rc.request().getParam("name");
+        if (name == null) {
+            name = "World";
+        }
+
+        JsonObject response = new JsonObject()
+                .put("content", String.format(template, name));
+
+        rc.response()
+                .putHeader(CONTENT_TYPE, "application/json; charset=utf-8")
+                .end(response.encodePrettily());
+    }
+
+}
 
 ```
-
-In this method we are chaining together multiple Futures with the final result either succeeding and starting the class or failing and preventing it from starting.
-
-1.  We have a Future<Void> method in our start signature.  This will tell our class that it has successfully started or not
-2.  We have a Future "init" which combines or "composes" loading the adjectives and starting the HttpServer
-3.  As each Future completes it kicks off the next one with its' success or failure.  A single failure will prevent our application from starting
 
 
 Re-run the test case and verify that it passes.

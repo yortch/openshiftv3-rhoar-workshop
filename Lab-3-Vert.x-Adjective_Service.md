@@ -40,6 +40,10 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/lab3/lab-03-vertx-02-browser_clone_download.png)  
 
+## Rename the directory
+
+First step: rename the directory from "insult-service-vertx" to "insult-adjectives."
+
 ## Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
