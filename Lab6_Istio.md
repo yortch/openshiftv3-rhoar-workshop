@@ -13,14 +13,14 @@ Prerequisites +
 
 
 
-* Step1 - Login to openshift +
+#### * Step1 - Login to openshift +
 ```java
 
 oc login https://master.35b7.summit.opentlc.com/login -u $USER_ID -p $PWD
 
 ```
 
-* Step 2 - Enable Istio Automatic injection @ Noun Service
+#### * Step 2 - Enable Istio Automatic injection @ Noun Service
 
 You can use any of the noun service i.e SpringBoot, Thorntile, Vert.x or Node.js. In this example , we will be using SpringBoot
 
@@ -30,7 +30,7 @@ cd insult-solution-noun-service-springboot-master
 
 
 ```
-* Step 2.1 Edit insult-solution-noun-service-springboot-master/pom.xml
+#### * Step 2.1 Edit insult-solution-noun-service-springboot-master/pom.xml
 
 ```xml
 <plugin>
@@ -63,7 +63,7 @@ cd insult-solution-noun-service-springboot-master
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 3 - Deploy Noun service
+#### * Step 3 - Deploy Noun service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
@@ -87,7 +87,7 @@ Please make sure build is successful
 [INFO] Finished at: 2019-05-06T07:52:11-04:00
 ```
 
-Step 4 - Enable Istio Automatic injection @ Adjective Service
+#### *Step 4 - Enable Istio Automatic injection @ Adjective Service
 You can use any of the adjective service i.e SpringBoot, Thorntile, Vert.x or Node.js. In this example , we will be using SpringBoot
 
 ```bash
@@ -96,7 +96,7 @@ cd insult-solution-adjective-service-springboot-master
 
 
 ```
-* Step 4.1 Edit insult-solution-adjective-service-springboot-master/pom.xml
+#### * Step 4.1 Edit insult-solution-adjective-service-springboot-master/pom.xml
 
 ```xml
 <plugin>
@@ -129,7 +129,7 @@ cd insult-solution-adjective-service-springboot-master
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 5 - Deploy Adjective service
+#### * Step 5 - Deploy Adjective service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
@@ -154,7 +154,7 @@ Please make sure build is successful
 
 
 ```
-Step 6 - Enable Istio Automatic injection @ Insult Service
+#### *Step 6 - Enable Istio Automatic injection @ Insult Service
 You can use any of the Insult service i.e SpringBoot, Thorntile, Vert.x or Node.js. In this example , we will be using SpringBoot
 
 ```bash
@@ -163,7 +163,7 @@ cd insult-solution-insult-service-springboot-master
 
 
 ```
-* Step 6.1 Edit insult-solution-insult-service-springboot-master/pom.xml
+#### * Step 6.1 Edit insult-solution-insult-service-springboot-master/pom.xml
 
 ```xml
 <plugin>
@@ -196,7 +196,7 @@ cd insult-solution-insult-service-springboot-master
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 7 - Deploy Insult service
+#### * Step 7 - Deploy Insult service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
@@ -224,7 +224,7 @@ INFO] F8: Using project: user1-insult-app
 ```
 
 
-* Step 8 - Create a Gateway to access your application
+#### * Step 8 - Create a Gateway to access your application
 In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations
 
 ```xml
@@ -284,13 +284,13 @@ spec:
           number: 8080
         host: insult-adjectives
 ```
-### Gateway : 
+#### Gateway :
 A Gateway configures a load balancer for HTTP/TCP traffic, most commonly operating at the edge of the mesh to enable ingress traffic for an application. The above gateway will direct all the HTTP traffic coming on port 80 at istio-ingressgateway to the insult application.
 
 The selector istio: ingressgateway pull the traffic coming to istio-ingressgateway service in the istio-system project
 The parameter hosts:  says that  traffic coming to this insult-app-gateway for any hostname will be consumed. If we want our application to cater to specific hostnames, we should list those here instead of using *
 
-### VirtualService:
+#### VirtualService:
  A VirtualService defines the rules that control how requests for a service are routed within an Istio service mesh. With the above virtualservice configuration:
 
 gateways: - insult-app-gateway configures it to listens to traffic coming to insult-app-gateway defined earlier
