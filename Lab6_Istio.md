@@ -59,20 +59,20 @@ cd insult-solution-noun-service-springboot-master
   </configuration>
 </plugin>
 
-``` 
+```
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 3 - Deploy Noun service 
+* Step 3 - Deploy Noun service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
 
 
-``` 
+```
 Please make sure build is successful
 ``` bash
- 
+
 
 [INFO] Created Service: target/fabric8/applyJson/user1-insult-app/service-insult-nouns.json
 [INFO] Using project: user1-insult-app
@@ -125,17 +125,17 @@ cd insult-solution-adjective-service-springboot-master
   </configuration>
 </plugin>
 
-``` 
+```
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 5 - Deploy Adjective service 
+* Step 5 - Deploy Adjective service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
 
 
-``` 
+```
 Please make sure build is successful
 ``` bash
 [INFO] F8: Using project: user1-insult-app
@@ -192,17 +192,17 @@ cd insult-solution-insult-service-springboot-master
   </configuration>
 </plugin>
 
-``` 
+```
 
 Please review the above fabric8-maven-plugin configuration, we are enabling istio side car injection while deploying the application with property sidecar.istio.io/inject
 
-* Step 7 - Deploy Insult service 
+* Step 7 - Deploy Insult service
 
 ``` bash
 mvn clean deploy:fabric8 -Popenshift
 
 
-``` 
+```
 Please make sure build is successful
 
 ``` bash
@@ -224,9 +224,73 @@ INFO] F8: Using project: user1-insult-app
 ```
 
 
-* Step 8 - Deploy gateway.yml to OpenShift +
+* Step 8 - Create a Gateway to access your application
+In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations
 
-```bash
-
-
+```xml
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: insult-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use Istio default gateway implementation
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "insult-service-user1-insult-app.apps.35b7.summit.opentlc.com"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: insult-app-virtual-service
+spec:
+  hosts:
+  - "insult-service-user1-insult-app.apps.35b7.summit.opentlc.com"
+  gateways:
+  - insult-app-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/insult
+    rewrite:
+      uri: /api/insult
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-service
+  - match:
+    - uri:
+        prefix: /api/noun
+    rewrite:
+      uri: /api/noun
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-nouns
+  - match:
+    - uri:
+        prefix: /api/adjective
+    rewrite:
+      uri: /api/adjective
+    route:
+    - destination:
+        port:
+          number: 8080
+        host: insult-adjectives
 ```
+### Gateway: A Gateway configures a load balancer for HTTP/TCP traffic, most commonly operating at the edge of the mesh to enable ingress traffic for an application. The above gateway will direct all the HTTP traffic coming on port 80 at istio-ingressgateway to the insult application.
+
+The selector istio: ingressgateway pull the traffic coming to istio-ingressgateway service in the istio-system project
+The parameter hosts:  says that  traffic coming to this insult-app-gateway for any hostname will be consumed. If we want our application to cater to specific hostnames, we should list those here instead of using *
+
+###VirtualService: A VirtualService defines the rules that control how requests for a service are routed within an Istio service mesh. With the above virtualservice configuration:
+
+gateways: - insult-app-gateway configures it to listens to traffic coming to insult-app-gateway defined earlier
+host: "*" caters to any hostnames. If we want specific hostname, we can change this to a specific hostname.
+URI matching allows it to listen to /insult etc.
