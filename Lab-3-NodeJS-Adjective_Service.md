@@ -1,6 +1,6 @@
 # Lab-3-NodeJS-Adjective_Service.md
 
-## Create a Project for the Spring Boot Twitter Service  
+## Create a Project for the NodeJS Adjective Service  
 
 ### Clone the app
 
