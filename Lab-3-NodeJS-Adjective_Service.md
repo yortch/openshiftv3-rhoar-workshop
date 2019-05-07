@@ -37,6 +37,18 @@ Change the name to "insult-adjectives"  from "insult-starter-nodejs":
 
 ```
 
+### Update the package-lock.json file
+
+Change the name to "insult-adjectives"  from "insult-starter-nodejs":
+
+```json
+
+{
+  "name": "insult-adjectives",
+  "version": "1.0.0",
+
+```
+
 ### Build and run
 
 Open a Terminal from Visual Studio Code by choosing "Terminal -> New Terminal" from the menu.  Run npm install and npm start:
@@ -72,7 +84,7 @@ Paste and enter the command into your terminal
 
 ```bash
 
-    npm run deploy
+    npm install && npm run openshift
 
 ```
 ### Validating the deployment:  
@@ -88,5 +100,90 @@ You should see:
 
 
 ![](./images/4-1/06-greeting_service.png)  
+
+## Get coding!
+
+### Create and fail a JUnit Test for our endpoint
+
+We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new class, "TwitterServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory with the following content:
+
+```javascript
+
+const test = require('tape');
+const supertest = require('supertest');
+
+const app = require('../app');
+
+test('test adjective', t => {
+  supertest(app)
+    .get('/api/greeting')
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .then(response => {
+      t.not(response.body.content, null);
+      t.end();
+    });
+});
+
+````
+
+```bash
+
+    npm test
+
+```
+
+Your test should of course fail.  If it doesn't feel free to raise your hand and ask for help
+
+```bash
+
+> insult-adjectives@1.0.0 test /insults-adjectives
+> tape test/*.js | tap-spec
+
+
+  test adjective
+
+    ✔ should not be equal
+
+  test out greeting route with no query param
+
+    ✔ should be equal
+
+  test out greeting route with a query param
+
+    ✔ should be equal
+
+
+  total:     3
+  passing:   3
+  duration:  161ms
+```
+
+### Stub out an adjective method
+
+Add the following method to app.js:
+
+```javascript
+
+app.use('/api/adjective', (request, response) => {
+  const name = request.query ? request.query.name : undefined;
+  response.send({content: `Verily, ye be a malmsey-nosed, unmuzzled whey-face!`});
+});
+
+```
+
+And re-run the tests, which this time, should pass:
+
+```bash
+
+    npm test
+
+    ...
+
+    total:     3
+    passing:   3
+    duration:  165ms
+
+```
 
 
