@@ -185,7 +185,114 @@ public class TwitterResourceTest {
 
 ```
 
+Run the test to verify that it fails:
 
-1. Create a new class, "UpdateStatusTest.java," in the "src/test/java/com/redhat/summit2019" directory
+```bash
 
-Enter the following content:
+mvn clean test
+
+```
+
+Run the test to verify that it fails:
+
+```bash
+
+mvn clean test
+
+```
+
+### Add Twitter4j dependenices
+
+Twitter has well documented API's for interacting with its' features, https://developer.twitter.com/content/developer-twitter/en.html.  If you are developing marketing applications for Twitter you will want to check them out.  
+
+For our purposes the excellent Twitter4j project has all of the functionality we need, http://twitter4j.org/en/index.html.  We will use Twitter4j to tweet our insults.
+
+Add the Twitter4j dependencies.  First, add the version in the pom's properties section:
+
+```xml
+
+    <twitter4j.version>[4.0,)</twitter4j.version>
+
+```
+
+Then add the dependency to the dependencies section:
+
+```xml
+
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-core</artifactId>
+      <version>${twitter4j.version}</version>
+    </dependency>
+
+```
+
+#### Add our Twitter properties
+
+Create a file "twitter4j.properties" in src/main/resources:
+
+```yaml
+
+debug=true
+oauth.consumerKey=YOUR_KEY
+oauth.consumerSecret=YOUR_CONSUMER_SECRET
+oauth.accessToken=YOUR_ACCESS_TOKEN
+oauth.accessTokenSecret=YOUR_ACCESS_TOKEN_SECRET
+
+```
+
+You will need to add your accounts' settings here.  For the sake of this lab you can use the following:
+
+```yaml
+
+
+```
+
+Twitter4j will automatically pick up these properties!
+
+### A domain model
+
+Our service will be receiving a single insult so we only need to model that object.  Create a new package "com.redhat.summit2019.model," ("src/main/java/com/redhat/summit2019/model.")  Create new class "Insult.java," in the package with the following content:
+
+```java
+
+package com.redhat.summit2019.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class Insult {
+
+    String insult;
+
+    @JsonCreator
+    public Insult(@JsonProperty("id") String insult) {
+        this.insult = insult;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("\"insult\":\"");
+        builder.append(getInsult());
+        builder.append("\"");
+        builder.append("}");
+        return builder.toString();
+
+    }
+
+    public String getInsult() {
+        return insult;
+    }
+
+    public void setInsult(String insult) {
+        this.insult = insult;
+    }
+}
+
+
+```
+
+You may not recognize the, "@JsonCreator" annotation on the constructor.  We need this to properly unmarshall the Json payload from our endpoint.
+
