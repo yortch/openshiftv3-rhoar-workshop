@@ -152,7 +152,7 @@ Now that we know our basic application deploys we can begin implementing the fun
 
 ### Create and fail a JUnit Test for our endpoint
 
-1. Create a new test class, NounResourceTest.java
+1. Create a new test class, TwitterResourceTest.java
 
 Enter the following content:
 
@@ -167,24 +167,32 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.wildfly.swarm.arquillian.DefaultDeployment;
 
+import static org.junit.Assume.assumeNoException;
+
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.redhat.summit2019.model.Insult;
+
 @RunWith(Arquillian.class)
 @DefaultDeployment
-public class NounResourceTest {
+public class TwitterResourceTest {
 
     @Test
     @RunAsClient
     public void serviceInvocation() {
         Client client = ClientBuilder.newClient();
         WebTarget target = client.target("http://localhost:8080")
-                .path("api").path("noun");
+                .path("api").path("tweet");
 
-        Response response = target.request(MediaType.APPLICATION_JSON).get();
+        Insult insult = new Insult("Verily, ye be a goatish, mangled miscreant!");
+
+        Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.entity(insult, MediaType.APPLICATION_JSON));
+
         Assert.assertEquals(200, response.getStatus());
         Assert.assertNotNull(response.readEntity(String.class));
     }
@@ -193,11 +201,50 @@ public class NounResourceTest {
 
 ```
 
+Obviously to get this to compile we need an Insult model.  Let's create a new package "com.redhat.summit2019.model" (or directory "src/main/java/com/redhat/summit2019/model") in the src/main/java folder.
+
+Add a class "Insult.java" in the package with the following content:
+
+```java
+
+package com.redhat.summit2019.model;
+
+public class Insult {
+
+
+    String insult;
+
+    public Insult(String insult) {
+        this.insult = insult;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder builder = new StringBuilder();
+        builder.append("{");
+        builder.append("\"insult\":\"");
+        builder.append(getInsult());
+        builder.append("\"");
+        builder.append("}");
+        return builder.toString();
+
+    }
+
+    public String getInsult() {
+        return insult;
+    }
+
+    public void setInsult(String insult) {
+        this.insult = insult;
+    }
+}
+
+```
 Run the test either by Clicking the "Run Test" link in the IDE (just under the @Test annotation) or in the terminal with:
 
 ```bash
 
-mvn clean test -Dtest=NounServiceTest
+mvn clean test -Dtest=TwitterResourceTest
 
 ```
 
@@ -206,66 +253,6 @@ Obviously our test should fail.  If for some reason it passes feel free to raise
 ### Pass our JUnit test
 
 #### Steps
-
-1. Create a Noun domain model
-2. Create a NounRepository to retrieve a Noun    
-3. Create a NounService to return JSON
-
-###  Create Noun Model Class  
-
-We are only returning a String and don't really need a domain model, but to be consistent with real applications let's create an Adjective for our domain model.  Create a class, "Noun" in the package, "io.openshift.booster.nouns.model"
-
-
-![](./images/4.SpringBootNoutModelClass.png)  
-
-
-````java
-
-package com.redhat.summit2019.model;
-
-import java.util.Objects;
-
-public class Noun {
-    private String noun;
-
-    public Noun() {
-    }
-
-    public Noun(String noun) {
-        this.noun = noun;
-    }
-
-    public String getNoun() {
-        return noun;
-    }
-
-    public Noun noun(String noun) {
-        this.noun = noun;
-        return this;
-    }
-
-    public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if ((o == null) || (getClass() != o.getClass()))
-            return false;
-        Noun noun1 = (Noun) o;
-        return Objects.equals(noun, noun);
-    }
-
-    public int hashCode() {
-        return Objects.hash(new Object[] { noun });
-    }
-
-    public String toString() {
-        StringBuffer sb = new StringBuffer("Noun{");
-        sb.append("noun='").append(noun).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
-}
-
-````
 
 ##### Create NounResource
 
@@ -291,10 +278,10 @@ We will create a class, "NounResource."" to retrieve and return an adjective in 
 In this workshop we will load nouns from a file and store them in an ArrayList.  We will use the @PostConstruct method to load the Nouns into a List as soon as the class is instantiated and then return a randomly selected Noun from the list:
 
 
-###  Create NounResource Class  
+###  Create a TwitterResource Class  
 
 Package: com.redhat.summit2019  
-Name: NounResource  
+Name: TwitterResource  
 
 
 ![](./images/4.SpringBootNounRest.png)  
