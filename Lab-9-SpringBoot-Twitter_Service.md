@@ -1,6 +1,6 @@
 # Lab-7-SpringBoot-Twitter_Service.md
 
-## Create the Spring Boot Twitter Service  
+## Create a Project for the Spring Boot Twitter Service  
 
 ###  Clone the repository 
 
@@ -12,26 +12,27 @@ git clone https://github.com/jeremyrdavis/insult-starter-springboot
 
 ```
 
-##### Download the project zip file
+### Or download the project zip file
 
-Download the zip file from Github by opening git clone https://github.com/jeremyrdavis/insult-starter-springboot
+You can download the zip file from Github by opening https://github.com/jeremyrdavis/insult-starter-springboot
 and choosing, "Download ZIP" from the green, "Clone or Download" button
 
-![](./images/4-1/github-download_zip.png)  
+![](./images/lab7/lab7-sb-01-download.png)  
 
-##### Rename the Folder
+### Rename the folder
+
 Rename the folder from "insult-starter-springboot" to "twitter-service"
 
-##### Import the app into VS Code
+### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
-##### Update the project settings
+### Update the project settings
 
 We need to update our project's settings from the default starter app to the adjective service we are building.
 
-Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
-"insult-nouns," "Spring Boot Insult Nouns Service," and "Spring Boot Noun Service for Shakespearean Insults Workshop."
+Open the pom.xml file and change the artifactId, name, and description to 
+"insult-tweets," "Spring Boot Insult Twitter Service," and "Spring Boot Twitter Service for Shakespearean Insults Workshop."
 
 ```xml
 
@@ -42,20 +43,21 @@ Open the pom.xml file and change the artifactId, name, and description (lines 25
 
 ```
 
+### Verify that the project builds
+
 ```bash
 
 mvn clean package
 
 ```
+
 The tests should all complete successfully, and you should see a success message.
 
 ![](./images/4-1/vscode-01-clean_package.png)  
 
 ![](./images/4-1/vscode-02-build_success.png)  
 
-### Deploying to OpenShift  
-
-#### Building a Docker container for OpenShift
+### Verify that the project deploys to OpenShift  
 
 We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.
 
@@ -91,6 +93,8 @@ oc whoami
 
 If the response is your username then you are still logged in.  If you are still logged in you can skip the next step.
 
+##### Log back in to OpenShift
+
 Fabric8 will build a Docker container and deploy it to OpenShift for us, but we need to be logged in first.  From your OpenShift console copy the login command by clicking on your name in the top right and choosing, "Copy Login Command."
 
 ![](./images/4-1/04-copy_login_command.png)  
@@ -106,11 +110,13 @@ Now we can deploy our app.  From the terminal run the following maven command:
 
 ```bash
 
-mvn clean fabric8:deploy -Popenshift  
+mvn clean fabric8:deploy -Popenshift -DskipTests 
 
 ```
 
-#### Validating the deployment:  
+We have already run the tests so we will skip them to speed up the build
+
+### Validating the deployment:  
 
 1. Login to OpenShift Console - with your user name and password
 2. Click on Project ‘red-hat-summit-2019’ if you are not already in that project
@@ -127,11 +133,11 @@ You should see:
 ![](./images/4-1/06-greeting_service.png)  
 
 
-#### Create and fail a JUnit Test for our endpoint
+## Get coding!
 
-1. Create a new class, "UpdateStatusTest.java," in the "src/test/java/com/redhat/summit2019" directory
+### Create and fail a JUnit Test for our endpoint
 
-Enter the following content:
+We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new class, "TwitterServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory with the following content:
 
 ```java
 
@@ -161,7 +167,7 @@ public class TwitterServiceTest{
     public void testTwitterEndpoint() {
         Response response = given()
            .baseUri(baseURI())
-           .parameters("text", "Verily, ye be a pox-marked, rank blind-worm!")
+           .parameters("insult", "Verily, ye be a pox-marked, rank blind-worm!")
            .post(ENDPOINT_PATH)
            .then()
            .statusCode(200)
