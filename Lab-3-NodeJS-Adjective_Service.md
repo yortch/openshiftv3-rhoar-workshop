@@ -185,5 +185,83 @@ And re-run the tests, which this time, should pass:
     duration:  165ms
 
 ```
+Of course we aren't actually doing anything.
 
+### Load adjectives from a text file
 
+#### Create a database
+
+Create a new folder, "lib," in the project directory.  Create a file, "db.js" in "lib" directory with the following code:
+
+```javascript
+
+'use strict';
+
+/**
+ * A simple database of words from a text file. Each word
+ * in the file is separated by a newline.
+ */
+
+module.exports = exports = function textDb (file) {
+  const fs = require('fs');
+  const data = [];
+  fs.readFileSync(file, 'utf-8')
+    .split('\n')
+    .reduce((accum, word) => {
+      if (word && word.trim() !== '') data.push(word.trim());
+    }, data);
+
+  function get () {
+    return data[Math.floor(Math.random() * data.length)];
+  }
+
+  return {
+    get
+  };
+};
+
+```
+
+#### Import the database functionality
+
+Import the db functionality at the top of app.js:
+
+```javascript
+
+    const db = require('./lib/db')('./adjectives.txt');
+
+```
+
+Create a new method to return adjectives:
+
+```javascript
+
+    app.use('/api/adjective', (request, response) => {
+      response.json({ adjective: db.get() });
+    });
+
+```
+
+Re-run the tests, which should now pass:
+
+```javascript
+
+    npm test
+
+```    
+
+Verify by starting node:
+
+```javascript
+
+    npm start
+
+```    
+
+You should see JSON similar to the following:
+
+```javascript
+
+{"adjective":"lumpish"}
+
+```
