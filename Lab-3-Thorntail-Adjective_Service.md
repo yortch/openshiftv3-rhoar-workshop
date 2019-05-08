@@ -399,7 +399,7 @@ Re-run the test case and verify that it passes.
 Let's fire up Thorntail and check out the endpoint in a browser.  Inside of your project's "target" directly you will find a jar ending in "-thorntail.jar."  This is the jar we need to run:
 
 ```bash
-
+mvn clean package
 java -jar ./target/adjective-service-1.0.0-thorntail.jar
 
 ```
