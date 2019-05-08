@@ -47,7 +47,7 @@ Open the pom.xml file and change the artifactId and name to
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.redhat.summit2019</groupId>
   <artifactId>adjective-service</artifactId>
-  <version>1.0.0</version>
+  <version>v1</version>
   <packaging>war</packaging>
   <name>Thorntail Adjective Service</name>
 
@@ -61,6 +61,13 @@ We will use Maven to build our app.  Open a new Terminal either from the command
 ```bash
 
 mvn clean package
+
+```
+
+Note: Depending on internet speed, build may stuck here. Try Ctrl+c and run the command again. If it doesn't work, Please try with following
+
+```bash
+mvn clean package -DskipTests
 
 ```
 
