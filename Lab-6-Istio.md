@@ -26,11 +26,11 @@ You can use any of the noun service i.e SpringBoot, Thorntile, Vert.x or Node.js
 
 ```bash
 
-cd insult-solution-noun-service-springboot-master
+cd insult-nouns
 
 
 ```
-#### * Step 2.1 Edit insult-solution-noun-service-springboot-master/pom.xml
+#### * Step 2.1 Edit insult-nouns/pom.xml
 
 ```xml
 <plugin>
@@ -92,7 +92,7 @@ You can use any of the adjective service i.e SpringBoot, Thorntile, Vert.x or No
 
 ```bash
 
-cd insult-solution-adjective-service-springboot-master
+cd insult-adjectives
 
 
 ```
@@ -159,7 +159,7 @@ You can use any of the Insult service i.e SpringBoot, Thorntile, Vert.x or Node.
 
 ```bash
 
-cd insult-solution-insult-service-springboot-master
+cd insult-service
 
 
 ```
@@ -225,7 +225,7 @@ INFO] F8: Using project: user1-insult-app
 
 
 #### * Step 8 - Create a Gateway to access your application
-In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations
+In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations. Replace <user1> with your assigned user id
 
 ```xml
 apiVersion: networking.istio.io/v1alpha3
@@ -432,7 +432,7 @@ virtualservice.networking.istio.io "insult-app-virtual-service" created
 
 ```
 
-In order to access this application from outside the cluster you will use http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult
+In order to access this application from outside the cluster you will use http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult. Replace the user1 with assigned userid.
 
 So how does the routing work?
 
