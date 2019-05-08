@@ -225,7 +225,7 @@ INFO] F8: Using project: user1-insult-app
 
 
 #### * Step 8 - Create a Gateway to access your application
-In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations
+In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations. Replace <user1> with your assigned user id
 
 ```xml
 apiVersion: networking.istio.io/v1alpha3
@@ -432,7 +432,7 @@ virtualservice.networking.istio.io "insult-app-virtual-service" created
 
 ```
 
-In order to access this application from outside the cluster you will use http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult
+In order to access this application from outside the cluster you will use http://insult-service-user1-insult-app.apps.35b7.summit.opentlc.com/api/insult. Replace the user1 with assigned userid.
 
 So how does the routing work?
 
