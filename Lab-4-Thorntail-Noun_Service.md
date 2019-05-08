@@ -157,7 +157,7 @@ Now that we know our basic application deploys we can begin implementing the fun
 
 ### Create and fail a JUnit Test for our endpoint
 
-1. Create a new test class, TwitterResourceTest.java
+1. Create a new test class, NounResourceTest.java
 
 Enter the following content:
 
@@ -214,33 +214,45 @@ Add a class "Insult.java" in the package with the following content:
 
 package com.redhat.summit2019.model;
 
-public class Insult {
+import java.util.Objects;
 
+public class Noun {
+    private String noun;
 
-    String insult;
-
-    public Insult(String insult) {
-        this.insult = insult;
+    public Noun() {
     }
 
-    @Override
-    public String toString(){
-        StringBuilder builder = new StringBuilder();
-        builder.append("{");
-        builder.append("\"insult\":\"");
-        builder.append(getInsult());
-        builder.append("\"");
-        builder.append("}");
-        return builder.toString();
-
+    public Noun(String noun) {
+        this.noun = noun;
     }
 
-    public String getInsult() {
-        return insult;
+    public String getNoun() {
+        return noun;
     }
 
-    public void setInsult(String insult) {
-        this.insult = insult;
+    public Noun noun(String noun) {
+        this.noun = noun;
+        return this;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if ((o == null) || (getClass() != o.getClass()))
+            return false;
+        Noun noun1 = (Noun) o;
+        return Objects.equals(noun, noun);
+    }
+
+    public int hashCode() {
+        return Objects.hash(new Object[] { noun });
+    }
+
+    public String toString() {
+        StringBuffer sb = new StringBuffer("Noun{");
+        sb.append("noun='").append(noun).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }
 
