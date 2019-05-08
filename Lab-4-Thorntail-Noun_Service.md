@@ -16,6 +16,11 @@ Download the zip file from Github by opening https://github.com/jeremyrdavis/tho
 
 ![](./images/4-1/github-download_zip.png)  
 
+## Change project folder name to insult-nouns
+
+Please change the project name from thorntail-insult-starter to insult-nouns
+
+
 ### Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
@@ -29,7 +34,7 @@ Our first step will be to customize the starter application.  Open the pom.xml a
 20  <modelVersion>4.0.0</modelVersion>
 21  <groupId>com.redhat.summit2019</groupId>
 22  <artifactId>insult-nouns</artifactId>
-23  <version>1.0.0</version>
+23  <version>v1</version>
 24  <packaging>war</packaging>
 25  <name>Insult Nouns</name>
 
