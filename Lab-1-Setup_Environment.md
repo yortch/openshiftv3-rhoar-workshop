@@ -16,7 +16,7 @@ Please read the pre-requisites for this workshop. If you cannot meet these pre-r
 	
 ###  Install Visual Studio 	
 	
-### Copy the installers from flash drive
+Copy the installers from flash drive
 	
 
 
