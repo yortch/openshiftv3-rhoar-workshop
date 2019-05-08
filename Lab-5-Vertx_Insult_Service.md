@@ -1,27 +1,41 @@
 # Lab 5 Vert.x Insult Service
 
-## Pre-requisites 
+## Create the Spring Boot Insult Service
 
-Must have completed labs 1-3. We will be using those components for following labs
+### Steps
 
-## Description
+1. Clone or download a starter app from Github
+2. Build and deploy to verify our starter app
+3. Create a test to excercise our functionality
+4. Implement the functionality
+5. Re-deploy
 
-The idea of this lab is to generate to random noun and an adjective to generate an insult. It is based on the following idea:  
-http://www.literarygenius.info/a1-shakespearean-insults-generator.htm  
+The project is based on the REST level 0 example application from OpenShift Launcher.  You can find OpenShift Launcher at https://launch.openshift.io 
 
-## Steps
+## Set the active project
 
-1. Verify that you are logged into OpenShift
-2. Clone or download the sample project from Github
-2. Add the necessary functionality to return adjectives
-
-## Verify that you are logged into OpenShift
+Use the oc application to see which project you are using:
 
 ```bash
 
- oc whoami
+oc projects
+
+...
+
+* istio-system
+userXX-insult-app
 
 ```
+
+If you do not have an asterisk next to userXX-insult-app run the following command to set userXX-insult-app as the active project:
+
+```bash
+
+oc project userXX-insult-app
+
+```
+
+In this lab we will create a microservice that returns a complete insult.  We will call the Adjective service twice, the Noun service, and concatenate the results with our basic insult text.
 
 ##  Clone or download the repository 
 
@@ -36,15 +50,15 @@ and choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/lab3/lab-03-vertx-02-browser_clone_download.png)  
 
-## Rename the directory
+## Rename the Folder
 
-First step: rename the directory from "insult-service-vertx" to "shakespearean-insults."
+Rename the folder from "insult-starter-springboot" to "insult-service"
 
 ## Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
-### Update the app
+## Update the app
 
 Second open the pom.xml and change "artifactId," "name," and "description" to "shakespearean-insults," "Shakespearean Insults," and "Red Hat Summit 2019 Shakespearean Insult Workshop" respectively:
 
@@ -52,7 +66,7 @@ Second open the pom.xml and change "artifactId," "name," and "description" to "s
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.redhat.summit2019</groupId>
-  <artifactId>shakespearean-insults</artifactId>
+  <artifactId>insult-service</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
   <name>Shakespearean Insults</name>
@@ -142,13 +156,23 @@ This build will take longer because we are building Docker containers in additio
 [INFO] ------------------------------------------------------------------------
 
 ```
-### Verify OpenShift deployment
+#### Validating the deployment:  
 
-You should see your pod running in OpenShift, and clicking on the url should display the default "Greeting" application.
+1. Login to OpenShift Console - with user userXX/r3dh4t1!
+2. Click on Project ‘userXX-insult-app’ if you are not already in that project
+3. You should see 1 running pod and a url that you can access
+4. Try the url
 
-![](./images/lab3/lab-03-vertx-04-ocp_deploy_success.png)  
 
-![](./images/lab3/lab-03-vertx-05-ocp_greeting.png)  
+![](./images/lab3/lab-03-sb-ocp_initial_deployment.png)  
+
+
+You should see:
+
+
+![](./images/4-1/06-greeting_service.png)  
+
+##  Write code!
 
 ##  Create an Insult Rest Service
 
@@ -513,8 +537,10 @@ public class InsultEndpointTest {
                 new DeploymentOptions().setConfig(
                         new JsonObject()
                                 .put("http.port", PORT)
-                                .put("adjective.url", "insult-adjectives-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
-                                .put("noun.url", "insult-starter-vertx-redhat-summit-insult-workshop-vertx.b9ad.pro-us-east-1.openshiftapps.com")
+                                .put("adjective.port", 80)
+                                .put("noun.port", 80)
+                                .put("adjective.url", "insult-adjectives-redhat-summit-insult-services.b9ad.pro-us-east-1.openshiftapps.com")
+                                .put("noun.url", "insult-nouns-redhat-summit-insult-services.b9ad.pro-us-east-1.openshiftapps.com")
                 ),
                 context.asyncAssertSuccess());
         client = WebClient.create(vertx);
@@ -625,6 +651,8 @@ public class Insult {
     }
 }
 ```
+
+#### Update HttpApplication
 
 ##### Change our imported classes
 
@@ -896,7 +924,7 @@ Re-run the test case and verify that it passes.
 
 ```bash
 
-mvn clean test -Dtest=NounEndpointTest
+mvn clean test -Dtest=InsultEndpointTest
 
 ```
 
