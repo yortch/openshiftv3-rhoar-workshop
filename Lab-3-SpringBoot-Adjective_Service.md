@@ -168,7 +168,7 @@ We will be following Test Driven Development in this tutorial so our first step 
 
 ### Create and fail a JUnit Test for our endpoint
 
-1. Create a new class, "AdjectiveServiceTest," in the "com.redhat.summit2019" package ("src/main/java/com/redhat/summit2019/AdjectiveServiceTest.java.")
+1. Create a new class, "AdjectiveServiceTest," in the "com.redhat.summit2019" package ("src/test/java/com/redhat/summit2019/AdjectiveServiceTest.java.")
 
 Enter the following content:
 
@@ -191,7 +191,7 @@ import io.restassured.response.Response;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AdjectiveServiceTest {
 
-    private static final String ENDPOINT_PATH = "api/adjective";
+    private static final String ENDPOINT_PATH = "/adjective";
 
     @Value("${local.server.port}")
     private int port;
