@@ -1,6 +1,6 @@
-# Lab-4-NodeJS-noun_Service.md
+# Lab-5-NodeJS-Insult_Service.md
 
-## Create a Project for the NodeJS noun Service  
+## Create a Project for the NodeJS insult Service  
 
 ### Clone the app
 
@@ -32,19 +32,19 @@ Change the name to "insult-nouns"  from "insult-starter-nodejs":
 ```json
 
 {
-  "name": "insult-nouns",
+  "name": "insult-service",
   "version": "1.0.0",
 
 ```
 
 ### Update the package-lock.json file
 
-Change the name to "insult-nouns"  from "insult-starter-nodejs":
+Change the name to "insult-service"  from "insult-starter-nodejs":
 
 ```json
 
 {
-  "name": "insult-nouns",
+  "name": "insult-service",
   "version": "1.0.0",
 
 ```
@@ -59,7 +59,41 @@ Open a Terminal from Visual Studio Code by choosing "Terminal -> New Terminal" f
 
 ```
 
-### Deploy to OpenShift
+### Deploy to OpenShift## Get coding!
+
+### Create and fail a JUnit Test for our endpoint
+
+We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new class, "TwitterServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory with the following content:
+
+```javascript
+
+const test = require('tape');
+const supertest = require('supertest');
+
+const app = require('../app');
+
+test('test noun', t => {
+  supertest(app)
+    .get('/api/greeting')
+    .expect('Content-Type', /json/)
+    .expect(200)
+    .then(response => {
+      t.not(response.body.content, null);
+      t.end();
+    });
+});
+
+````
+
+```bash
+
+    npm test
+
+```
+
+Your test should of course fail.  If it doesn't feel free to raise your hand and ask for help
+
+
 
 You may still be logged into OpenShift.  You can check by running the following command:
 
@@ -105,7 +139,7 @@ You should see:
 
 ### Create and fail a JUnit Test for our endpoint
 
-We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new class, "TwitterServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory with the following content:
+We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new file, "insult-test.js," in the "test" directory with the following content:
 
 ```javascript
 
@@ -114,9 +148,9 @@ const supertest = require('supertest');
 
 const app = require('../app');
 
-test('test noun', t => {
+test('test insult', t => {
   supertest(app)
-    .get('/api/greeting')
+    .get('/api/insult')
     .expect('Content-Type', /json/)
     .expect(200)
     .then(response => {
@@ -131,33 +165,15 @@ test('test noun', t => {
 
     npm test
 
+    ...
+
+    total:     3
+    passing:   2
+    failing:   1
+
 ```
 
 Your test should of course fail.  If it doesn't feel free to raise your hand and ask for help
-
-```bash
-
-> insult-nouns@1.0.0 test /insults-nouns
-> tape test/*.js | tap-spec
-
-
-  test noun
-
-    ✔ should not be equal
-
-  test out greeting route with no query param
-
-    ✔ should be equal
-
-  test out greeting route with a query param
-
-    ✔ should be equal
-
-
-  total:     3
-  passing:   3
-  duration:  161ms
-```
 
 ### Stub out an noun method
 
@@ -165,9 +181,9 @@ Add the following method to app.js:
 
 ```javascript
 
-app.use('/api/noun', (request, response) => {
+app.use('/api/insult', (request, response) => {
   const name = request.query ? request.query.name : undefined;
-  response.send({noun: `whey-face`});
+  response.send({content: `Verily, ye be a malmsey-nosed, unmuzzled whey-face!`});
 });
 
 ```
@@ -187,81 +203,4 @@ And re-run the tests, which this time, should pass:
 ```
 Of course we aren't actually doing anything.
 
-### Load nouns from a text file
 
-#### Create a database
-
-Create a new folder, "lib," in the project directory.  Create a file, "db.js" in "lib" directory with the following code:
-
-```javascript
-
-'use strict';
-
-/**
- * A simple database of words from a text file. Each word
- * in the file is separated by a newline.
- */
-
-module.exports = exports = function textDb (file) {
-  const fs = require('fs');
-  const data = [];
-  fs.readFileSync(file, 'utf-8')
-    .split('\n')
-    .reduce((accum, word) => {
-      if (word && word.trim() !== '') data.push(word.trim());
-    }, data);
-
-  function get () {
-    return data[Math.floor(Math.random() * data.length)];
-  }
-
-  return {
-    get
-  };
-};
-
-```
-
-#### Import the database functionality
-
-Import the db functionality at the top of app.js:
-
-```javascript
-
-    const db = require('./lib/db')('./nouns.txt');
-
-```
-
-Create a new method to return nouns:
-
-```javascript
-
-    app.use('/api/noun', (request, response) => {
-      response.json({ noun: db.get() });
-    });
-
-```
-
-Re-run the tests, which should now pass:
-
-```javascript
-
-    npm test
-
-```    
-
-Verify by starting node:
-
-```javascript
-
-    npm start
-
-```    
-
-You should see JSON similar to the following:
-
-```javascript
-
-{"noun":"lumpish"}
-
-```
