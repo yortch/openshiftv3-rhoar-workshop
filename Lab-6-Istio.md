@@ -426,7 +426,7 @@ spec:
 #### * Step 9 - Apply gateway config
 
 ```
-oc apply -f gateway.yml -n user1-insult-app
+oc apply -f gateway.yml -n userx-insult-app
 gateway.networking.istio.io "insult-app-gateway" created
 virtualservice.networking.istio.io "insult-app-virtual-service" created
 
@@ -459,9 +459,9 @@ istio-ingressgateway       istio-ingressgateway-istio-system.apps.35b7.summit.op
 
 One of these routes is the route named istio-ingressgateway that was created when the Istio control plane was deployed The other one named as insult-app-gateway-kw6dq (in your case the name could be slightly different), is the one that is just automatically added by IOR pod.
 
-Note: If multiple people are creating their apps, there may be many routes as IOR will expose all those routes.
+Note: If multiple people are creating their apps, there may be many routes as IOR will expose all those routes. Replace userx with your assigned user id.
 
-So when you access your application hostname (in this case insult-service-user1-insult-app.apps.35b7.summit.opentlc.com), since there is an openshift route, the request will come to istio-ingressgateway service. Based on the gateway and virtualservice configurations discussed above, the traffic will land in your application.
+So when you access your application hostname (in this case insult-service-userx-insult-app.apps.35b7.summit.opentlc.com), since there is an openshift route, the request will come to istio-ingressgateway service. Based on the gateway and virtualservice configurations discussed above, the traffic will land in your application.
 
 To summarize the routing:
 
@@ -537,7 +537,7 @@ spec:
   subsets:
   - name: v1
     labels:
-      version: 1.0.0
+      version: v1
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -568,7 +568,7 @@ spec:
   subsets:
   - name: v1
     labels:
-      version: 1.0.0
+      version: v1
 
 
 ```
