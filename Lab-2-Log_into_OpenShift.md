@@ -30,7 +30,7 @@ If you are working from a command prompt simply paste the command into the promp
 
 ```bash
 
-oc login https://api.pro-us-east-1.openshift.com --token=EbJWOzrH7bWkp_ARZzOALheibhQoAtm3A4Ftq23cGSqx31UU
+    oc login https://master.35b7.summit.opentlc.com:443 --token=EbJWOzrH7bWkp_ARZzOALheibhQoAtm3A4Ftq23cGSqx31UU
 
 ```
 
