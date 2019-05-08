@@ -1,8 +1,46 @@
 # Lab 4: Creating a SpringBoot Noun Service
 
-## Create Noun Spring Rest Service  
+## Description
 
-###  Clone the repository 
+In this lab we will create a rest service that returns an noun.
+
+The idea of this lab is to generate to random noun to be used when creating insults. It is based on the following idea:  
+http://www.literarygenius.info/a1-shakespearean-insults-generator.htm  
+
+### Steps
+
+1. Clone or download a starter app from Github
+2. Build and deploy to verify our starter app
+3. Create a test to excercise our functionality
+4. Implement the functionality
+5. Re-deploy
+
+The project is based on the REST level 0 example application from OpenShift Launcher.  You can find OpenShift Launcher at https://launch.openshift.io 
+
+## Set the active project
+
+Use the oc application to see which project you are using:
+
+```bash
+
+oc projects
+
+...
+
+* istio-system
+userXX-insult-app
+
+```
+
+If you do not have an asterisk next to userXX-insult-app run the following command to set userXX-insult-app as the active project:
+
+```bash
+
+oc project userXX-insult-app
+
+```
+
+##  Clone the repository 
 
 ```bash
 
@@ -10,35 +48,41 @@ git clone https://github.com/jeremyrdavis/insult-starter-springboot
 
 ```
 
-##### Download the project zip file
+### Download the project zip file
 
-Download the zip file from Github by opening git clone https://github.com/jeremyrdavis/insult-starter-springboot
-and choosing, "Download ZIP" from the green, "Clone or Download" button
+If you don't have Git, or if you simply prefer to work from a zip file you can download a zip file of the project from Github at https://github.com/jeremyrdavis/insult-starter-springboot
+by choosing, "Download ZIP" from the green, "Clone or Download" button
 
 ![](./images/4-1/github-download_zip.png)  
 
-##### Rename the Folder
+## Rename the Folder
+
 Rename the folder from "insult-starter-springboot" to "noun-service"
 
-##### Import the app into VS Code
+## Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
-##### Update the project settings
+## Update the project settings
 
-We need to update our project's settings from the default starter app to the adjective service we are building.
+We need to update our project's settings from the default starter app to the noun service we are building.
 
-Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
-"insult-nouns," "Spring Boot Insult Nouns Service," and "Spring Boot Noun Service for Shakespearean Insults Workshop."
+Open the pom.xml file and change the artifactId, name, and description to 
+"insult-nouns," "Spring Boot Insult Noun Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
 
 ```xml
 
-25  <artifactId>insult-nouns</artifactId>
-26  <version>1.0.0</version>
-27  <name>Spring Boot Insult Noun Service</name>
-28  <description>Spring Boot Noun Service for Shakespearean Insults Workshop</description>
+  <artifactId>insult-nouns</artifactId>
+  <version>1.0.0</version>
+  <name>Spring Boot Insult Noun Service</name>
+  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
 
 ```
+
+## Build the app
+
+We will use Maven to build our app.  Open a new Terminal either from the command line or within Visual Studio Code by choosing, "Terminal -> New Terminal"
+
 
 ```bash
 
@@ -52,12 +96,11 @@ The tests should all complete successfully, and you should see a success message
 
 ![](./images/4-1/vscode-02-build_success.png)  
 
+## Deploying to OpenShift  
 
-### Deploying to OpenShift  
+### Building a Docker container for OpenShift
 
-#### Building a Docker container for OpenShift
-
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.
 
 ```xml
 
@@ -79,31 +122,7 @@ We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  Th
 
 You can read more about the Fabric8 project here, http://fabric8.io/
 
-
-#### Log in to OpenShift
-
-You may still be logged into OpenShift.  You can check by running the following command:
-
-```bash
-
-oc whoami
-
-```
-
-If the response is your username then you are still logged in.  If you are still logged in you can skip the next step.
-
-Fabric8 will build a Docker container and deploy it to OpenShift for us, but we need to be logged in first.  From your OpenShift console copy the login command by clicking on your name in the top right and choosing, "Copy Login Command."
-
-![](./images/4-1/04-copy_login_command.png)  
-
-Paste and enter the command into your terminal
-
-![](./images/4-1/vscode-03-login.png)  
-
-
-#### Build and deploy to OpenShift
-
-Now we can deploy our app.  From the terminal run the following maven command:
+From the terminal run the following maven command:
 
 ```bash
 
@@ -114,7 +133,6 @@ mvn clean fabric8:deploy -Popenshift
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
 ```bash
-
 [INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -122,23 +140,17 @@ This build will take longer because we are building Docker containers in additio
 [INFO] Total time:  06:40 min
 [INFO] Finished at: 2019-04-24T12:49:12-04:00
 [INFO] ------------------------------------------------------------------------
-
 ```
-
-![](./images/4-1/vscode-04-fabric8_deploy.png)  
-
-![](./images/4-1/vscode-05-fabric8_deploy_success.png)  
-
 
 #### Validating the deployment:  
 
-1. Login to OpenShift Console - with your user name and password
-2. Click on Project ‘red-hat-summit-2019’ if you are not already in that project
+1. Login to OpenShift Console - with user userXX/r3dh4t1!
+2. Click on Project ‘userXX-insult-app’ if you are not already in that project
 3. You should see 1 running pod and a url that you can access
 4. Try the url
 
 
-![](./images/4-1/05-initial_deploy.png)  
+![](./images/lab3/lab-03-sb-ocp_initial_deployment.png)  
 
 
 You should see:
@@ -146,18 +158,15 @@ You should see:
 
 ![](./images/4-1/06-greeting_service.png)  
 
+##  Write code!
 
-##  Create Noun REST Service
+Now that we got an understanding of how to build our application and deploy it to OpenShift it's time to implement some actual functionality.  We need a REST endpoint that returns an noun.
 
-###  Create Adjective Rest Service
+We will be following Test Driven Development in this tutorial so our first step is to create a Unit Test.  We will use JUnit in this application.
 
-Now that we have an adjective REST endpoint, and we know that our project builds and deploys it's time to implement some actual functionality.  We will take the same, test-driven approach to building the Noun Service as we did the Adjective Service.
+### Create and fail a JUnit Test for our endpoint
 
-We need a REST endpoint that returns an adjective.  Since we are following Test Driven Development in this tutorial our first step is to create a Unit Test.  We will use JUnit in this application.
-
-#### Create and fail a JUnit Test for our endpoint
-
-1. Create a new class, "NounServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory
+1. Create a new class, "NounServiceTest," in the "com.redhat.summit2019" package ("src/main/java/com/redhat/summit2019/NounServiceTest.java.")
 
 Enter the following content:
 
@@ -216,16 +225,11 @@ Obviously our test should fail.  If for some reason it passes feel free to raise
 
 ### Pass our JUnit test
 
-#### Steps
+#### Noun domain model
 
-We are only returning a String and don't really need a domain model, but we are going to pretend that we are creating a full application and create a domain model with an Adjective class.
+We are only returning a String and don't really need a domain model, but we are going to pretend that we are creating a full application and create a domain model with an Noun class.
 
-####  Create Noun Model Class  
-
-First create a new folder under "src/main/java/com/redhat/summit2019" named, "model."  Second create a class, "Noun.java" in your new model package:
-
-
-![](./images/4.SpringBootNoutModelClass.png)  
+First create a new package "com.redhat.summit2019.model" ("src/main/java/com/redhat/summit2019/model.")  Second create a class, "Noun" in the new model package ("src/main/java/com/redhat/summit2019/model/Noun.java"):
 
 
 ```java
@@ -280,7 +284,7 @@ public class Noun {
 
 Spring Data uses a repository abstraction to reduce boilerplate database code.  If you are familiar with Spring Boot you are familiar with classes like CrudRepository and JpaRepository.
 
-In this tutorial we will use a text file instead of a database to keep things simple.  However, we will follow the Spring Data convention and create an AdjectiveRepository.
+In this tutorial we will use a text file instead of a database to keep things simple.  However, we will follow the Spring Data convention and create an NounRepository.
 
 Create a new package, "com.redhat.summit2019.repository," and add a new class, "NounRepositry," with the following code:
 
@@ -327,13 +331,10 @@ public class NounRepository {
 
 ```
 
-###  Create Noun Rest Class  
+### Create an NounService
 
-Package: io.openshift.booster.noun.service  
-Name: NounServiceController  
+We now have everything we need to return an Noun.  It is time to create an NounService to expose the REST endpoint.  Create a new class, "NounService," in the package, "com.redhat.summit2019.service" with the following code:
 
-
-![](./images/4.SpringBootNounRest.png)  
 
 ```java
 
@@ -360,7 +361,7 @@ import org.springframework.stereotype.Component;
 
 @Path("/")
 @Component
-public class NounServiceController {
+public class NounService {
    
     private final AtomicLong counter = new AtomicLong();
     private List<Noun> nouns = new ArrayList<Noun>();
@@ -396,7 +397,9 @@ public class NounServiceController {
 
 Re-run the test case and verify that it passes.
 
-#### Re-deploy to OpenShift
+Re-run the test case and verify that it passes.
+
+### Re-deploy to OpenShift
 
 From the terminal run the following maven command:
 
@@ -418,5 +421,7 @@ This build will take longer because we are building Docker containers in additio
 [INFO] ------------------------------------------------------------------------
 ```
 
+### Recap
 
-  
+Our second service is complete!
+
