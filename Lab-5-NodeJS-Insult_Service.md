@@ -169,4 +169,98 @@ And re-run the tests, which this time, should pass:
 ```
 Of course we aren't actually doing anything.
 
+## Pass our test
 
+Let's create 2 new services to retrieve adjectives and a noun.  Create a "lib" folder in the project directory.  Add a file, "adjective-service.js" with the following content:
+
+```javascript
+
+const roi = require('roi');
+
+const adjectiveService = process.env.ADJECTIVE_SERVICE || 'insult-adjectives';
+const adjectivePort = process.env.ADJECTIVE_SERVICE_PORT || '8080';
+const serviceUrl = `http://${adjectiveService}:${adjectivePort}/api/adjective`;
+
+function parseResponse (response) {
+  try {
+    return JSON.parse(response.body).adjective;
+  } catch (err) {
+    console.error('Unable to parse adjective service response', response);
+    console.error(err);
+    return err.toString();
+  }
+}
+
+module.exports = exports = {
+  get: async function get () {
+    return roi.get(serviceUrl).then(parseResponse);
+  }
+};
+
+```
+
+And an extremely similar "noun-service.js":
+
+```javascript
+
+const roi = require('roi');
+
+const nounService = process.env.NOUN_SERVICE || 'insult-nouns';
+const nounPort = process.env.NOUN_SERVICE_PORT || '8080';
+const serviceUrl = `http://${nounService}:${nounPort}/api/noun`;
+
+function parseResponse (response) {
+  try {
+    return JSON.parse(response.body).noun;
+  } catch (err) {
+    console.error('Unable to parse adjective service response', response);
+    console.error(err);
+    return err.toString();
+  }
+}
+
+module.exports = exports = {
+  get: async function get () {
+    return roi.get(serviceUrl).then(parseResponse);
+  }
+};
+
+```
+
+### Update our App
+
+Import the 2 services in App.js:
+
+```javascript
+
+const adj_service = require('./lib/adjective-service');
+const noun_service = require('./lib/noun-service');
+
+```
+
+And create a method to call them and concatentate the results:
+
+```javascript
+
+app.use('/api/insult', (request, response) => {
+  response.type('application/json');
+  // call adjective and noun services
+  return Promise.all([
+    adj_service.get(),
+    adj_service.get(),
+    noun_service.get()
+  ])
+    // eslint-disable-next-line standard/object-curly-even-spacing
+    .then(words => response.send({ insult: `Verily, ye be a ${words[0]}, ${words[1]} ${words[2]}!` }))
+    .catch(e => console.error(`An unexpected error occurred: ${e}`));
+});
+
+```
+
+We can now push to OpenShift:
+
+```bash
+
+npm run openshift
+
+```
