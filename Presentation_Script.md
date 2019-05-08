@@ -1,1 +1,5 @@
 Presentation Script
+
+OpenShift presentation
+OpenShift Launcher
+Istio presentation
