@@ -26,11 +26,11 @@ You can use any of the noun service i.e SpringBoot, Thorntile, Vert.x or Node.js
 
 ```bash
 
-cd insult-solution-noun-service-springboot-master
+cd insult-nouns
 
 
 ```
-#### * Step 2.1 Edit insult-solution-noun-service-springboot-master/pom.xml
+#### * Step 2.1 Edit insult-nouns/pom.xml
 
 ```xml
 <plugin>
@@ -92,7 +92,7 @@ You can use any of the adjective service i.e SpringBoot, Thorntile, Vert.x or No
 
 ```bash
 
-cd insult-solution-adjective-service-springboot-master
+cd insult-adjectives
 
 
 ```
@@ -159,7 +159,7 @@ You can use any of the Insult service i.e SpringBoot, Thorntile, Vert.x or Node.
 
 ```bash
 
-cd insult-solution-insult-service-springboot-master
+cd insult-service
 
 
 ```
