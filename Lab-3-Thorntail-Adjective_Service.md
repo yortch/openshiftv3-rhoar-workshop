@@ -14,11 +14,10 @@ git clone https://github.com/jeremyrdavis/insult-starter-thorntail.git
 
 ```
 
-### Download the project zip file
+### (OR) Download the project zip file 
 
 You can download the zip file from Github instead of cloning it by opening 
 
-TODO: INSERT_ZIP_DOWNLOAD
 
 and choosing, "Download ZIP" from the green, "Clone or Download" button
 
@@ -87,8 +86,7 @@ Type the command into your terminal:
 
 ```bash
 
-oc login https://api.pro-us-east-1.openshift.com --token=EbJWOzrH7bWkp_ARZzOALheibhQoAtm3A4Ftq23cGSqx31UU
-
+oc login https://master.35b7.summit.opentlc.com --token=<<REPLACE WITH YOUR TOKEN>>
 ```
 
 or into the terminal in Visual Studio Code:
@@ -99,7 +97,7 @@ or into the terminal in Visual Studio Code:
 
 ```bash
 
- oc project red-hat-summit-insults-userXX
+ oc project userxx-insult-app
 
 ```
 
