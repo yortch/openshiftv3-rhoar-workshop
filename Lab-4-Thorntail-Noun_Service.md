@@ -206,7 +206,7 @@ public class NounResourceTest {
 
 ```
 
-Obviously to get this to compile we need an Insult model.  Let's create a new package "com.redhat.summit2019.model" (or directory "src/main/java/com/redhat/summit2019/model") in the src/main/java folder.
+Obviously to get this to compile we need an Noun model.  Let's create a new package "com.redhat.summit2019.model" (or directory "src/main/java/com/redhat/summit2019/model") in the src/main/java folder.
 
 Add a class "Insult.java" in the package with the following content:
 
