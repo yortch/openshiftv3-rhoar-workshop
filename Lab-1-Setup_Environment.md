@@ -16,7 +16,7 @@ Please read the pre-requisites for this workshop. If you cannot meet these pre-r
 	
 ###  Install Visual Studio 	
 	
-#### Copy the installers from flash drive
+### Copy the installers from flash drive
 	
 
 
@@ -39,7 +39,7 @@ https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view
 
 
 
-*Installing the Command-line Tools*
+### Installing the Command-line Tools ###
 
 After completing this section, you should be able to:
 
@@ -97,12 +97,7 @@ The easiest way to initially setup the OpenShift CLI is to use the
 and password. The information is automatically saved in a CLI
 configuration file that is then used for subsequent commands.
 
-To login to a remote server use:
 
-[source,shell]
-----
-$ oc login <hostname>:<port>
-----
 
 
 
