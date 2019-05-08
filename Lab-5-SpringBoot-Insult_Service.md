@@ -2,16 +2,41 @@
 
 ## Create the Spring Boot Insult Service
 
+### Steps
+
+1. Clone or download a starter app from Github
+2. Build and deploy to verify our starter app
+3. Create a test to excercise our functionality
+4. Implement the functionality
+5. Re-deploy
+
+The project is based on the REST level 0 example application from OpenShift Launcher.  You can find OpenShift Launcher at https://launch.openshift.io 
+
+## Set the active project
+
+Use the oc application to see which project you are using:
+
+```bash
+
+oc projects
+
+...
+
+* istio-system
+userXX-insult-app
+
+```
+
+If you do not have an asterisk next to userXX-insult-app run the following command to set userXX-insult-app as the active project:
+
+```bash
+
+oc project userXX-insult-app
+
+```
+
+
 In this lab we will create a microservice that returns a complete insult.  We will call the Adjective service twice, the Noun service, and concatenate the results with our basic insult text.
-
-### Pre-requisites 
-
-Must have completed labs 1-4. We will be using those components for this lab.
-
-### Description
-
-The idea of this lab is to call the Adjective and Noun services and generate a complete insult. It is based on the following idea:  
-http://www.literarygenius.info/a1-shakespearean-insults-generator.htm  
 
 ###  Clone the repository 
 
@@ -27,30 +52,30 @@ Download the zip file from Github by opening https://github.com/jeremyrdavis/ins
 
 ![](./images/4-1/github-download_zip.png)  
 
-##### Rename the Folder
-Rename the folder from "insult-starter-springboot" to "shakespearean-insults"
+## Rename the Folder
 
-##### Import the app into VS Code
+Rename the folder from "insult-starter-springboot" to "insult-service"
+
+## Import the app into VS Code
 
 Open Visual Studio Code, choose "Open," and navigate to the root folder of the project
 
-##### Update the project settings
+## Update the project settings
 
-We need to update our project's settings from the default starter app to the adjective service we are building.
+We need to update our project's settings from the default starter app to the noun service we are building.
 
-Open the pom.xml file and change the artifactId, name, and description (lines 25-28) to 
-"shakespearean-insults," "Spring Boot Sha Nouns Service," and "Spring Boot Noun Service for Shakespearean Insults Workshop."
+Open the pom.xml file and change the artifactId, name, and description to 
+"insult-service," "Spring Boot Insult Service," and "Spring Boot Insult App for Shakespearean Insults Workshop."
 
 ```xml
 
-25  <artifactId>shakespearean-insults</artifactId>
-26  <version>1.0.0</version>
-27  <name>Spring Boot Shakespearean Insults Service</name>
-28  <description>Spring Boot Insults Service for Shakespearean Insults Workshop</description>
+  <artifactId>insult-service</artifactId>
+  <version>1.0.0</version>
+  <name>Spring Boot Insult Service</name>
+  <description>Spring Boot Insult App for Shakespearean Insults Workshop</description>
 
 ```
-
-### Build the app
+## Build the app
 
 We will use Maven to build our app.  Open a new Terminal either from the command line or within Visual Studio Code by choosing, "Terminal -> New Terminal"
 
@@ -67,12 +92,11 @@ The tests should all complete successfully, and you should see a success message
 
 ![](./images/4-1/vscode-02-build_success.png)  
 
+## Deploying to OpenShift  
 
-### Deploying to OpenShift  
+### Building a Docker container for OpenShift
 
-#### Building a Docker container for OpenShift
-
-We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.  Check out lines 214-226:
+We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  The fabric8 plugin is already part of your pom.xml.
 
 ```xml
 
@@ -94,31 +118,7 @@ We will use the Fabric8 Maven Plugin to deploy our application to OpenShift.  Th
 
 You can read more about the Fabric8 project here, http://fabric8.io/
 
-
-#### Log in to OpenShift
-
-You may still be logged into OpenShift.  You can check by running the following command:
-
-```bash
-
-oc whoami
-
-```
-
-If the response is your username then you are still logged in.  If you are still logged in you can skip the next step.
-
-Fabric8 will build a Docker container and deploy it to OpenShift for us, but we need to be logged in first.  From your OpenShift console copy the login command by clicking on your name in the top right and choosing, "Copy Login Command."
-
-![](./images/4-1/04-copy_login_command.png)  
-
-Paste and enter the command into your terminal
-
-![](./images/4-1/vscode-03-login.png)  
-
-
-#### Build and deploy to OpenShift
-
-Now we can deploy our app.  From the terminal run the following maven command:
+From the terminal run the following maven command:
 
 ```bash
 
@@ -129,7 +129,6 @@ mvn clean fabric8:deploy -Popenshift
 This build will take longer because we are building Docker containers in addition to our Spring Boot application.  When the build and push to OpenShift is complete you will see a success message similar to the following:
 
 ```bash
-
 [INFO] F8: HINT: Use the command `oc get pods -w` to watch your pods start up
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -137,20 +136,25 @@ This build will take longer because we are building Docker containers in additio
 [INFO] Total time:  06:40 min
 [INFO] Finished at: 2019-04-24T12:49:12-04:00
 [INFO] ------------------------------------------------------------------------
-
 ```
-
-![](./images/4-1/vscode-04-fabric8_deploy.png)  
-
-![](./images/4-1/vscode-05-fabric8_deploy_success.png)  
-
 
 #### Validating the deployment:  
 
-1. Login to OpenShift Console - with your user name and password
-2. Click on your project if you are not already in that project
-3. You should see running pods for the Adjective, Noun, and Insult services
-4. Try the url for the Insult service
+1. Login to OpenShift Console - with user userXX/r3dh4t1!
+2. Click on Project ‘userXX-insult-app’ if you are not already in that project
+3. You should see 1 running pod and a url that you can access
+4. Try the url
+
+
+![](./images/lab3/lab-03-sb-ocp_initial_deployment.png)  
+
+
+You should see:
+
+
+![](./images/4-1/06-greeting_service.png)  
+
+##  Write code!
 
 ##  Create Insult REST Service
 
@@ -710,4 +714,7 @@ This build will take longer because we are building Docker containers in additio
 
 ![](./images/4-1/vscode-05-fabric8_deploy_success.png)  
 
+### Recap
+
+Our third service is complete!
 
