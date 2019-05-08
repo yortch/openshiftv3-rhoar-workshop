@@ -8,6 +8,8 @@
 
 ### Log into the OpenShift web console
 
+URL: https://master.35b7.summit.opentlc.com
+
 Open the url provided by your instructor and log in with your username and password.  Your username/password combination will be something like user15/r3dh4t1!
 
 ![](./images/lab2/lab2-01-console.png)  
