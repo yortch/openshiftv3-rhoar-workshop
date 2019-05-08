@@ -155,7 +155,7 @@ Please make sure build is successful
 
 ```
 #### *Step 6 - Enable Istio Automatic injection @ Insult Service
-You can use any of the Insult service i.e SpringBoot, Thorntile, Vert.x or Node.js. In this example , we will be using SpringBoot
+You can use any of the Insult service i.e SpringBoot, Thorntile, Vert.x or Node.js. In this example , we will be using SpringBoot. 
 
 ```bash
 
@@ -222,7 +222,125 @@ INFO] F8: Using project: user1-insult-app
 
 
 ```
+#### * Step 7.1  - Deploy Noun service Version2
 
+We will deploying a different version(v2) of noun service to use it for our AB Testing lab. 
+
+Go to OpenShift console at https://master.35b7.summit.opentlc.com/console/ with your assigned userid/password
+
+
+1. Navigate to Home page.
+2. On the right side top corner, click on Add to Project->Import Json/Yaml
+3. Please copy the below yaml
+
+```xml
+
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+        sidecar.istio.io/inject: 'true'
+  labels:
+    app: insult-nouns
+    group: com.redhat.summit2019
+    version: v2
+    provider: fabric8
+  name: insult-nouns-v2
+spec:
+  replicas: 1
+  selector:
+    app: insult-nouns
+    group: com.redhat.summit2019
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 3600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: 'true'
+      labels:
+        app: insult-nouns
+        group: com.redhat.summit2019
+        version: v2
+        provider: fabric8
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          image: rammaddali/insult-nouns:2.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - curl
+                - 'http://localhost:8080/health'
+            failureThreshold: 2
+            initialDelaySeconds: 60
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: spring-boot
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9779
+              name: prometheus
+              protocol: TCP
+            - containerPort: 8778
+              name: jolokia
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - curl
+                - 'http://localhost:8080/health'
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          securityContext:
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+
+
+
+```
+
+Click Deploy. You should see the pod coming up successfully.
+
+
+
+
+#### * Step 7.2 - Delete existing routes
+
+Please execute below command, please replace userx with assigned userid
+
+```bash
+oc delete route insult-nouns -n userx-insult-app
+oc delete route insult-adjectives -n userx-insult-app
+oc delete route insult-service -n userx-insult-app
+```
 
 #### * Step 8 - Create a Gateway to access your application
 In order to make your application accessible from outside the cluster, an Istio Gateway is required. Let us understand gateway and virtual service configurations. Replace <user1> with your assigned user id
