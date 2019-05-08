@@ -12,20 +12,13 @@ URL: https://master.35b7.summit.opentlc.com
 
 Open the url provided by your instructor and log in with your username and password.  Your username/password combination will be something like user15/r3dh4t1!
 
+NOTE: Your browser will probably warn you about the site's certificate.  Don't worry about that.
+
 ![](./images/lab2/lab2-01-console.png)  
 
-### Create a new project
+### Your projects
 
-Click the blue, "Create Project" button in the top right of your screen to create a new project.  You can name your project anything you want as long as you don't want spaces or special characters.  
-
-We suggest:
-* Name: redhat-summit-insults
-* Display Name: Red Hat Summit Insults
-* Description: Awesome Red Hat Summit Insult Workshop
-
-![](./images/lab2/lab2-02-console_create_project.png)  
-
-![](./images/lab2/lab2-03-console_create_project_success.png)  
+You have 2 projects in your cluster, "istio-system," and "userXX-insult-app.""  "istio-system" will be used for the Istio lab, and "userXX-insult-app" will be used for the other labs.
 
 ### Log in from your laptop
 
