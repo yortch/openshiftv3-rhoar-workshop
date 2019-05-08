@@ -12,156 +12,102 @@ Please read the pre-requisites for this workshop. If you cannot meet these pre-r
 	* Windows
 	* macOS
 	* Linux
+	
+	
+###  Install Visual Studio 	
+	
+#### Copy the installers from flash drive
+	
 
-**If macOS:** In a terminal, run the sysctl -a | grep machdep.cpu.features command. The result will be a string of features. If the output includes VMX, the machine has Virtualization enabled. If not enabled see your system’s documentation for instruction.
 
-**If Windows:** Ensure that Virtualization is enabled in your machine’s BIOS settings. If Red Hat Development Suite is run on a new system, ensure that Virtualization is enabled in the BIOS settings. This is required to run VirtualBox. See your system’s documentation for instructions to change BIOS settings.
+** If MaCOS: *** 
 
-* Recommended system requirements for Red Hat Development Suite are:
-	* 16 GB RAM
-	* 47 GB disk space
-	* CPU Intel i5 2GHz or better
+Copy VisualStudio binary  from usb to the location of your choice and follow the below instructions
 
-* Ensure that Java SE 1.8.0 is installed:
-If macOS: Download and install Java SE 1.8.0 Build 111 from the Oracle website: Java Download.
+https://docs.microsoft.com/en-us/visualstudio/mac/installation?view=vsmac-2019
 
-* Ensure Maven 3.5 or above is installed.
 
-### Register with Red Hat
-In order to use Red Hat Development Suite, you need an account with [developers.redhat.com](http://developers.redhat.com)
 
-Please navigate to the link from your browser, use `Register` link on the top right to register yourself, if you haven't done so.
 
-Note your credentials (`username` and `password`) as you will need them later.
 
-### Copy the installers from flash drive
 
-*  Copy contents from the flash drive to your local machine
-*  Navigate to `DevSuiteInstaller` folder. This folder has bundled installers for MacOS and Windows.
-	* Mac installer is named `devsuite-2.3.0-GA-bundle-installer-mac.dmg`
-	* Windows installer is named `devsuite-2.3.0-GA-bundle-installer.exe`
 
 
-### Install Development Suite: 
+*If Windows:** Copy VisualStudio installer from usb to the location of your choice and follow the below instructions
 
-------------
+https://docs.microsoft.com/en-us/visualstudio/install/install-visual-studio?view=vs-2019
 
 
 
-**On Mac:**	
+*Installing the Command-line Tools*
 
-Double click on the installer file named `devsuite-2.3.0-GA-bundle-installer-mac.dmg`
+After completing this section, you should be able to:
 
-It will open up the installer window. Double click on the `Red Hat Developer Suite Installer` icon (the Red Sphere)
+* Locate the binaries for the OpenShift Container Platform command-line
+interface (OCP CLI)
+* Install the OCP CLI tools.
+* CLI basic configuration
 
-![](./images/1.DevSuiteMac.jpeg)
+*Locating the binaries*
 
-The installer will warn you about the content. Click on `Open` button to move forward.
+The OCP CLI exposes commands for managing applications, as well as
+lower-level tools to interact with each component of a system. The
+binaries for Mac, Windows, and Linux are available to copy from flash drive 
 
-![](./images/2.DevSuiteMac.jpeg)
+Copy the OC libraries from flash drive 
 
 
-**On Windows:**
+You can also download the libraries from here .
 
-Double click on the installer file named `devsuite-2.3.0-GA-bundle-installer.exe`
+* Supported Binary from the Red Hat Portal: https://access.redhat.com/downloads/content/290
+* Upstream Origin Binary: https://github.com/openshift/origin/releases
+* Past releases: https://mirror.openshift.com/pub/openshift-v3/clients
 
-Click `Yes` when it asks "Do you want to allow this app to make changes to your device?`
+*Installing the CLI tools*
 
-**On RHEL:**
+The CLI is provided as compressed files that can be decompressed to any
+directory. In order to make it simple for any user to access the OCP
+CLI, it is recommended that it is made available in a directory mapped
+to the environment variable called `PATH` from the OS. More information
+can be found about installation process here:
+https://docs.openshift.com/container-platform/latest/cli_reference/get_started_cli.html
 
-Register your system with your developer account
+1.  *OSX and Linux:*
++
+1.1. Copy the binary to the `/usr/local/bin` directory, or one of the
+paths listed in the `PATH` environment variable.
+2.  *Windows:*
++
+2.1. Use oc.exe to open an OpenShift shell. If you getting error from
+running oc, go to git-scm.com to download git bash for Windows (during
+installation you need to specify in the selection to integrate with the
+command prompt)
++
+2.2. Download and install Notepad++ and install the JSON plugin or use
+http://jsonlint.com/ to edit and validate JSON.
++
+http://ammonsonline.com/formatted-json-in-notepad/
++
+2.3. Configure your default editor to be Notepad++
 
-```
-subscription-manager register
-```
+*CLI basic configuration*
 
-You're looking for the `Pool ID` of your `Developer Entitlement`
+The easiest way to initially setup the OpenShift CLI is to use the
+`oc login` command. It’ll interactively ask you a server URL, username
+and password. The information is automatically saved in a CLI
+configuration file that is then used for subsequent commands.
 
-```
-subscription-manager list --available --matches '*Developer*'
-```
+To login to a remote server use:
 
-Attach to the corresponding `Pool ID`
+[source,shell]
+----
+$ oc login <hostname>:<port>
+----
 
-```
-subscription-manager attach --pool <pool id uuid>
-```
 
-Make sure you're subscribed to the proper channels
 
-```
-subscription-manager repos --disable=*
-subscription-manager repos --enable=rhel-7-server-rpms \
---enable rhel-7-server-devtools-rpms \
---enable rhel-server-rhscl-7-rpms \
---enable rhel-7-server-extras-rpms \
---enable rhel-7-server-optional-rpms
-```
 
-Next, add the Red Hat Developer Tools key to your system
 
-```
-cd /etc/pki/rpm-gpg
-wget -O RPM-GPG-KEY-redhat-devel https://www.redhat.com/security/data/a5787476.txt
-rpm --import RPM-GPG-KEY-redhat-devel
-```
 
-Now you can install the developer suite
 
-```
-yum -y install rh-devsuite rh-eclipse47-devstudio
-```
-
-For RHEL users; you don't have to go any further.
-
--------------
-
-
-
-
-Click `Next` button to move forward on the next screen
-
-![](./images/3.DevSuiteMac.jpeg)
-
-Select an installation target folder by clicking on `Browse` or if you are happy with the default location simply press on `Next` and move ahead. **Note** on windows this default location shows up as `C:\Program Files\Development Suite`
-
-![](./images/4.DevSuiteMac.jpeg)
-
-Red Hat Development Suite installer can install a bunch of software for you. For the purpose of this workshop we are only interested in the following components:
-
-- Red Hat JBoss Developer Studio
-- Oracle Java (1.8) - if not already installed
-- Red Hat Container Development Kit
-- XHyve Hypervisor - if not already installed
-- Cygwin (2.10.0) - on Windows
-
-We had requested in the prerequisites for this lab that you will need a Java 1.8 and a Hypervisor. If you already have these components installed, they are auto detected by the installer. If not, the installer will add them for you.
-
-Select above components in the `Selection` tab. If any other components are checked, you can uncheck them to get through the installation faster.
-
-
-![](./images/5.DevSuiteMac.jpeg)
-
-Look at the `Confirmation Summary` to make sure you have selected the right components to install and click `Next`. If the selects are not good, you can go back to the `Selection` tab by pressing `Back` button and change.
- 
-![](./images/6.DevSuiteMac.jpeg)
-
-Now it's time to enter your Red Hat Developers Program credentials that you noted earlier. If you haven't registered yet, you have a chance to register now. Also choose `remember be` to let Developer Studio remember your credentials. Now press on `Download & Install` button.
-
-![](./images/7.DevSuiteMac.jpeg)
-
-The installation starts now. Since we have provided a bundled installer, nothing is downloaded from internet. 
-
-![](./images/8.DevSuiteMac.jpeg)
-
-The installer will expect you to have admin rights on the box. It will ask you for your credentials to be able to make changes to the device. Enter your administrative credentials for your workstation. 
-
-![](./images/9.DevSuiteMac.jpeg)
-
-Installer will run for a few mins. Once complete you'll see the success screen. Close the installer now.
-
-![](./images/10.DevSuiteMac.jpeg)
-
-
-Congratulations!! You have successfully installed Red Hat Development Suite on your workstation.
 
