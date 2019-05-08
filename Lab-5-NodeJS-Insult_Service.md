@@ -59,41 +59,7 @@ Open a Terminal from Visual Studio Code by choosing "Terminal -> New Terminal" f
 
 ```
 
-### Deploy to OpenShift## Get coding!
-
-### Create and fail a JUnit Test for our endpoint
-
-We are of course practicing TDD in this tutorial so our first step will be to write a Unit Test.  Create a new class, "TwitterServiceTest.java," in the "src/test/java/com/redhat/summit2019" directory with the following content:
-
-```javascript
-
-const test = require('tape');
-const supertest = require('supertest');
-
-const app = require('../app');
-
-test('test noun', t => {
-  supertest(app)
-    .get('/api/greeting')
-    .expect('Content-Type', /json/)
-    .expect(200)
-    .then(response => {
-      t.not(response.body.content, null);
-      t.end();
-    });
-});
-
-````
-
-```bash
-
-    npm test
-
-```
-
-Your test should of course fail.  If it doesn't feel free to raise your hand and ask for help
-
-
+## Get coding!
 
 You may still be logged into OpenShift.  You can check by running the following command:
 
@@ -175,7 +141,7 @@ test('test insult', t => {
 
 Your test should of course fail.  If it doesn't feel free to raise your hand and ask for help
 
-### Stub out an noun method
+### Stub out an insult method
 
 Add the following method to app.js:
 

@@ -193,14 +193,6 @@ mvn clean test
 
 ```
 
-Run the test to verify that it fails:
-
-```bash
-
-mvn clean test
-
-```
-
 ### Add Twitter4j dependenices
 
 Twitter has well documented API's for interacting with its' features, https://developer.twitter.com/content/developer-twitter/en.html.  If you are developing marketing applications for Twitter you will want to check them out.  
