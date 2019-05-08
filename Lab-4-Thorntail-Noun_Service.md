@@ -261,7 +261,7 @@ Run the test either by Clicking the "Run Test" link in the IDE (just under the @
 
 ```bash
 
-mvn clean test -Dtest=TwitterResourceTest
+mvn clean test -Dtest=NounResourceTest
 
 ```
 
@@ -295,13 +295,11 @@ We will create a class, "NounResource."" to retrieve and return an adjective in 
 In this workshop we will load nouns from a file and store them in an ArrayList.  We will use the @PostConstruct method to load the Nouns into a List as soon as the class is instantiated and then return a randomly selected Noun from the list:
 
 
-###  Create a TwitterResource Class  
+###  Create a NounResource Class  
 
 Package: com.redhat.summit2019  
 Name: TwitterResource  
 
-
-![](./images/4.SpringBootNounRest.png)  
 
 ```java
 
